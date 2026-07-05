@@ -466,5 +466,17 @@
       "visa_required": "{count} ülke için önceden vize gerekiyor"
     },
     "daysShort": "{days} gün"
+  },
+  "discover": {
+    "title": "Dünyayı çevirin, ilhamınızı bulun",
+    "subtitle": "Az bilinen ama görenleri büyüleyen köşeler — her çevirişte yeni bir keşif, kürenin durduğu yerde sizi bekliyor.",
+    "spin": "Küreyi çevir",
+    "spinAgain": "Tekrar çevir",
+    "hiddenGem": "Saklı cennet",
+    "aiThinking": "Avia bu yeri sizin için anlatıyor…",
+    "planTrip": "Bu yer için AI planı oluştur",
+    "viewOnMap": "Haritada gör",
+    "wikipedia": "Wikipedia",
+    "spinning": "Dünya dönüyor…"
   }
 }

@@ -466,5 +466,17 @@
       "visa_required": "{count} countries require a visa in advance"
     },
     "daysShort": "{days} days"
+  },
+  "discover": {
+    "title": "Spin the globe, find your muse",
+    "subtitle": "Little-known corners that enchant everyone who finds them — every spin lands on a new discovery.",
+    "spin": "Spin the globe",
+    "spinAgain": "Spin again",
+    "hiddenGem": "Hidden gem",
+    "aiThinking": "Avia is telling you about this place…",
+    "planTrip": "Create an AI plan for this place",
+    "viewOnMap": "View on map",
+    "wikipedia": "Wikipedia",
+    "spinning": "The world is turning…"
   }
 }

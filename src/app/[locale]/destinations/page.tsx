@@ -5,6 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { DESTINATIONS } from "@/content/destinations";
 import { FadeIn } from "@/components/fade-in";
+import { GlobeDiscovery } from "@/components/discover/globe-discovery";
 
 export async function generateMetadata({
   params,
@@ -31,6 +32,10 @@ export default async function DestinationsPage({
       <FadeIn>
         <h1 className="font-display text-4xl text-ink sm:text-5xl">{t("title")}</h1>
         <p className="mt-3 max-w-xl text-[15px] text-ink-soft">{t("subtitle")}</p>
+      </FadeIn>
+
+      <FadeIn className="mt-10">
+        <GlobeDiscovery />
       </FadeIn>
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
