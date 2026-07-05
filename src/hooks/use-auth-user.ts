@@ -2,18 +2,16 @@
 
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
-import { getSupabaseBrowser } from "@/lib/supabase/client";
+import { getSupabaseBrowser, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export function useAuthUser() {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Nothing to load when Supabase isn't configured
+  const [loading, setLoading] = useState(() => isSupabaseConfigured());
 
   useEffect(() => {
     const supabase = getSupabaseBrowser();
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
+    if (!supabase) return;
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user ?? null);
       setLoading(false);

@@ -13,8 +13,7 @@ const ROUTES: { from: string; to: string; image: string }[] = [
   {
     from: "IST",
     to: "GYD",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Panorama_of_night_Baku%2C_Azerbaijan_IMG_9682.jpg/800px-Panorama_of_night_Baku%2C_Azerbaijan_IMG_9682.jpg",
+    image: "/img/destinations/baku-hero.jpg",
   },
   {
     from: "GYD",
@@ -37,8 +36,7 @@ const ROUTES: { from: string; to: string; image: string }[] = [
   {
     from: "ESB",
     to: "GYD",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Baku%2C_Azerbaiy%C3%A1n%2C_2016-09-26%2C_DD_211.jpg/800px-Baku%2C_Azerbaiy%C3%A1n%2C_2016-09-26%2C_DD_211.jpg",
+    image: "/img/destinations/baku-maiden-tower.jpg",
   },
   {
     from: "IST",

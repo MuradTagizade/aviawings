@@ -49,8 +49,6 @@ export interface Destination {
   events: SeasonEvent[];
 }
 
-const WIKI = "https://upload.wikimedia.org/wikipedia/commons/thumb";
-
 export const DESTINATIONS: Destination[] = [
   {
     slug: "baku",
@@ -61,10 +59,10 @@ export const DESTINATIONS: Destination[] = [
       tr: "Hazar'ın kıyısında rüzgârın ve ateşin şehri",
       en: "City of wind and fire on the Caspian shore",
     },
-    heroImage: `${WIKI}/b/b4/Panorama_of_night_Baku%2C_Azerbaijan_IMG_9682.jpg/1600px-Panorama_of_night_Baku%2C_Azerbaijan_IMG_9682.jpg`,
-    cardImage: `${WIKI}/b/b4/Panorama_of_night_Baku%2C_Azerbaijan_IMG_9682.jpg/800px-Panorama_of_night_Baku%2C_Azerbaijan_IMG_9682.jpg`,
+    heroImage: "/img/destinations/baku-hero.jpg",
+    cardImage: "/img/destinations/baku-hero.jpg",
     gallery: [
-      `${WIKI}/6/61/Baku%2C_Azerbaiy%C3%A1n%2C_2016-09-26%2C_DD_211.jpg/1280px-Baku%2C_Azerbaiy%C3%A1n%2C_2016-09-26%2C_DD_211.jpg`,
+      "/img/destinations/baku-maiden-tower.jpg",
     ],
     lat: 40.4093,
     lon: 49.8671,
@@ -308,10 +306,10 @@ export const DESTINATIONS: Destination[] = [
       tr: "Cumhuriyetin kalbi, Anadolu'nun kavşağı",
       en: "Heart of the Republic, crossroads of Anatolia",
     },
-    heroImage: `${WIKI}/9/96/An%C4%B1tkabir%2C_Ankara%2C_Turqu%C3%ADa%2C_2024-10-03%2C_DD_25.jpg/1600px-An%C4%B1tkabir%2C_Ankara%2C_Turqu%C3%ADa%2C_2024-10-03%2C_DD_25.jpg`,
-    cardImage: `${WIKI}/9/96/An%C4%B1tkabir%2C_Ankara%2C_Turqu%C3%ADa%2C_2024-10-03%2C_DD_25.jpg/800px-An%C4%B1tkabir%2C_Ankara%2C_Turqu%C3%ADa%2C_2024-10-03%2C_DD_25.jpg`,
+    heroImage: "/img/destinations/ankara-hero.jpg",
+    cardImage: "/img/destinations/ankara-hero.jpg",
     gallery: [
-      `${WIKI}/c/cc/An%C4%B1tkabir%2C_Ankara%2C_Turqu%C3%ADa%2C_2024-10-03%2C_DD_27.jpg/1280px-An%C4%B1tkabir%2C_Ankara%2C_Turqu%C3%ADa%2C_2024-10-03%2C_DD_27.jpg`,
+      "/img/destinations/ankara-lions.jpg",
     ],
     lat: 39.9334,
     lon: 32.8597,
@@ -430,8 +428,8 @@ export const DESTINATIONS: Destination[] = [
       tr: "Ege'nin incisi, güneşin ve özgürlüğün şehri",
       en: "Pearl of the Aegean, city of sun and ease",
     },
-    heroImage: `${WIKI}/f/f5/Izmir_Konak_Square_and_Clock_Tower%2C_2026.jpg/1600px-Izmir_Konak_Square_and_Clock_Tower%2C_2026.jpg`,
-    cardImage: `${WIKI}/f/f5/Izmir_Konak_Square_and_Clock_Tower%2C_2026.jpg/800px-Izmir_Konak_Square_and_Clock_Tower%2C_2026.jpg`,
+    heroImage: "/img/destinations/izmir-hero.jpg",
+    cardImage: "/img/destinations/izmir-hero.jpg",
     gallery: [],
     lat: 38.4237,
     lon: 27.1428,
@@ -550,10 +548,10 @@ export const DESTINATIONS: Destination[] = [
       tr: "Turkuaz kıyıların ve antik kentlerin başkenti",
       en: "Capital of turquoise coasts and ancient cities",
     },
-    heroImage: `${WIKI}/a/af/Konyaalt%C4%B1_Beach_and_cliffs.jpg/1600px-Konyaalt%C4%B1_Beach_and_cliffs.jpg`,
-    cardImage: `${WIKI}/a/af/Konyaalt%C4%B1_Beach_and_cliffs.jpg/800px-Konyaalt%C4%B1_Beach_and_cliffs.jpg`,
+    heroImage: "/img/destinations/antalya-hero.jpg",
+    cardImage: "/img/destinations/antalya-hero.jpg",
     gallery: [
-      `${WIKI}/a/a0/J22_333_Antalya%2C_Hafenviertel.jpg/1280px-J22_333_Antalya%2C_Hafenviertel.jpg`,
+      "/img/destinations/antalya-kaleici.jpg",
     ],
     lat: 36.8969,
     lon: 30.7133,
@@ -672,8 +670,8 @@ export const DESTINATIONS: Destination[] = [
       tr: "Nizami'nin şehri, Azerbaycan'ın kadim ikincisi",
       en: "City of Nizami, Azerbaijan's ancient second city",
     },
-    heroImage: `${WIKI}/f/f3/City_of_Ganja_Azerbaijan.jpg/1600px-City_of_Ganja_Azerbaijan.jpg`,
-    cardImage: `${WIKI}/f/f3/City_of_Ganja_Azerbaijan.jpg/800px-City_of_Ganja_Azerbaijan.jpg`,
+    heroImage: "/img/destinations/ganja-hero.jpg",
+    cardImage: "/img/destinations/ganja-hero.jpg",
     gallery: [],
     lat: 40.6828,
     lon: 46.3606,

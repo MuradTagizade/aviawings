@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
 import { PlaneLanding, PlaneTakeoff } from "lucide-react";
@@ -30,8 +30,6 @@ export function AirportAutocomplete({
   useClickOutside(ref, () => setOpen(false), open);
 
   const results = searchAirports(query, locale);
-
-  useEffect(() => setHighlighted(0), [query]);
 
   function select(a: Airport) {
     onChange(a);
@@ -63,6 +61,7 @@ export function AirportAutocomplete({
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
+              setHighlighted(0);
               setOpen(true);
             }}
             onFocus={() => setOpen(true)}

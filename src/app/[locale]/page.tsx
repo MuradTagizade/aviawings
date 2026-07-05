@@ -5,7 +5,6 @@ import { PopularRoutes } from "@/components/home/popular-routes";
 import { Inspiration } from "@/components/home/inspiration";
 import { PlannerBanner } from "@/components/home/planner-banner";
 import { WhyUs } from "@/components/home/why-us";
-import { ComingSoon } from "@/components/home/coming-soon";
 
 export async function generateMetadata({
   params,
@@ -55,7 +54,6 @@ export default async function HomePage({
       <Inspiration />
       <PlannerBanner />
       <WhyUs />
-      <ComingSoon />
     </>
   );
 }

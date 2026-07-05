@@ -686,7 +686,7 @@ export function PlannerClient() {
           className="flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium text-ink-soft transition-colors hover:bg-sand disabled:opacity-0"
         >
           <ArrowLeft className="h-4 w-4" />
-          {useBackLabel(locale)}
+          {locale === "tr" ? "Geri" : "Back"}
         </button>
         {step < TOTAL_STEPS - 1 ? (
           <button
@@ -694,7 +694,7 @@ export function PlannerClient() {
             disabled={!canProceed}
             className="flex h-11 items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-cream transition-all hover:bg-ink/90 disabled:opacity-40"
           >
-            {useNextLabel(locale)}
+            {locale === "tr" ? "Devam" : "Continue"}
             <ArrowRight className="h-4 w-4" />
           </button>
         ) : (
@@ -709,11 +709,4 @@ export function PlannerClient() {
       </div>
     </div>
   );
-}
-
-function useBackLabel(locale: string) {
-  return locale === "tr" ? "Geri" : "Back";
-}
-function useNextLabel(locale: string) {
-  return locale === "tr" ? "Devam" : "Continue";
 }

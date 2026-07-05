@@ -42,18 +42,6 @@ export function Footer() {
                   {tn("planner")}
                 </Link>
               </li>
-              <li className="flex items-center gap-2 text-ink-faint">
-                {tn("hotels")}
-                <span className="rounded-full bg-gold-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold-deep">
-                  {tc("comingSoon")}
-                </span>
-              </li>
-              <li className="flex items-center gap-2 text-ink-faint">
-                {tn("esim")}
-                <span className="rounded-full bg-gold-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold-deep">
-                  {tc("comingSoon")}
-                </span>
-              </li>
             </ul>
           </div>
 

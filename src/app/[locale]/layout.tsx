@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
@@ -24,6 +24,14 @@ const inter = Inter({
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // Edge-to-edge on notched phones; components pad with safe-area insets
+  viewportFit: "cover",
+  themeColor: "#faf8f5",
+};
 
 export async function generateMetadata({
   params,

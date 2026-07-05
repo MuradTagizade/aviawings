@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx eslint *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{content_type}\\\\n\" http://localhost:3127/img/destinations/baku-hero.jpg)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{content_type}\\\\n\" \"http://localhost:3127/_next/image?url=%2Fimg%2Fdestinations%2Fbaku-hero.jpg&w=828&q=75\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{content_type}\\\\n\" \"http://localhost:3127/_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1527838832700-5059252407fa%3Fauto%3Dformat%26fit%3Dcrop%26w%3D800%26q%3D80&w=828&q=75\")",
+      "Bash(curl -s http://localhost:3127/tr)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3127/tr/destinations/baku)",
+      "Bash(curl -s http://localhost:3128/tr)",
+      "Bash(python3 -c \"import PIL; print\\('PIL var'\\)\")",
+      "Bash(curl -s http://localhost:3129/manifest.webmanifest)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s -o /dev/null -w \"icon-512: %{http_code}\\\\n\" http://localhost:3129/icon-512.png)",
+      "Bash(curl -s -o /dev/null -w \"apple-icon: %{http_code}\\\\n\" http://localhost:3129/apple-icon.png)",
+      "Bash(curl -sI http://localhost:3129/tr)",
+      "Bash(curl -s http://localhost:3129/tr)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3129/tr)",
+      "Bash(git commit -q -m 'Fix broken images, remove coming-soon teasers, PWA support, security hardening *)"
+    ]
+  }
+}

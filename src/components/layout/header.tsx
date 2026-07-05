@@ -28,14 +28,13 @@ export function Header() {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
+    const raf = requestAnimationFrame(onScroll);
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
-
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
@@ -48,7 +47,7 @@ export function Header() {
     <>
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-40 transition-all duration-300",
+          "safe-top fixed inset-x-0 top-0 z-40 transition-all duration-300",
           scrolled
             ? "border-b border-ink/5 bg-cream/85 shadow-soft backdrop-blur-xl"
             : "bg-transparent"
@@ -132,6 +131,7 @@ export function Header() {
                 >
                   <Link
                     href={href}
+                    onClick={() => setMobileOpen(false)}
                     className="block border-b border-ink/5 py-5 font-display text-3xl text-ink"
                   >
                     {t(key)}
@@ -146,6 +146,7 @@ export function Header() {
                 >
                   <Link
                     href={user ? "/account" : "/auth/sign-in"}
+                    onClick={() => setMobileOpen(false)}
                     className="block border-b border-ink/5 py-5 font-display text-3xl text-ink"
                   >
                     {user ? t("account") : t("signIn")}

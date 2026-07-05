@@ -494,7 +494,7 @@ export function ResultsClient() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 320, damping: 32 }}
-              className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-auto rounded-t-3xl bg-white p-6 pb-10 lg:hidden"
+              className="safe-bottom fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-auto rounded-t-3xl bg-white p-6 pb-10 lg:hidden"
             >
               <div className="mb-5 flex items-center justify-between">
                 <h2 className="font-display text-xl text-ink">{tf("title")}</h2>

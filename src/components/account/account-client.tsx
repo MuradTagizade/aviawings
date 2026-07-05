@@ -50,6 +50,15 @@ interface AlertRow {
   currency: string;
 }
 
+function EmptyState({ title, sub }: { title: string; sub: string }) {
+  return (
+    <div className="rounded-2xl border border-ink/5 bg-white p-12 text-center shadow-soft">
+      <p className="font-display text-xl text-ink">{title}</p>
+      <p className="mx-auto mt-2 max-w-sm text-sm text-ink-soft">{sub}</p>
+    </div>
+  );
+}
+
 export function AccountClient() {
   const t = useTranslations("account");
   const ta = useTranslations("auth");
@@ -171,15 +180,6 @@ export function AccountClient() {
     { key: "alerts", icon: Bell, label: t("tabs.alerts") },
     { key: "profile", icon: UserRound, label: t("tabs.profile") },
   ];
-
-  function EmptyState({ title, sub }: { title: string; sub: string }) {
-    return (
-      <div className="rounded-2xl border border-ink/5 bg-white p-12 text-center shadow-soft">
-        <p className="font-display text-xl text-ink">{title}</p>
-        <p className="mx-auto mt-2 max-w-sm text-sm text-ink-soft">{sub}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="mx-auto max-w-4xl px-4 pb-24 pt-28 sm:px-6">
