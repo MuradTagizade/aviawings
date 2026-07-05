@@ -49,8 +49,8 @@ export interface FlightOffer {
 
 export interface FlightSearchResult {
   offers: FlightOffer[];
-  /** 'amadeus' = live test API, 'mock' = demo engine */
-  source: "amadeus" | "mock";
+  /** 'duffel'/'amadeus' = live API, 'mock' = demo engine */
+  source: "duffel" | "amadeus" | "mock";
 }
 
 export interface FlightProvider {

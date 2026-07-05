@@ -22,7 +22,8 @@ Hiçbir API anahtarı olmadan da site tamamen çalışır:
 
 | Servis | Env değişkeni | Nereden |
 |---|---|---|
-| Amadeus test API (uçuşlar) | `AMADEUS_CLIENT_ID/SECRET` | [developers.amadeus.com](https://developers.amadeus.com) — ücretsiz |
+| Duffel (uçuşlar — önerilen) | `DUFFEL_ACCESS_TOKEN` | [app.duffel.com/join](https://app.duffel.com/join) — ücretsiz anlık test modu |
+| ~~Amadeus test API~~ | `AMADEUS_CLIENT_ID/SECRET` | ⚠️ Self-service portal 17 Tem 2026'da kapanıyor; yeni kayıt alınmıyor |
 | OpenRouter (AI) | `OPENROUTER_API_KEY` | [openrouter.ai/keys](https://openrouter.ai/keys) |
 | Supabase (auth + DB) | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | [supabase.com](https://supabase.com) — ücretsiz proje |
 | GA4 / Meta Pixel | `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_META_PIXEL_ID` | Reklam hesapları açılınca |
@@ -59,6 +60,8 @@ src/
 supabase/migrations/     # Şema + RLS politikaları
 ```
 
-Aracı kurum API'si bağlanacağı zaman tek yapılacak:
+Uçuş sağlayıcı öncelik sırası: **Duffel → Amadeus (varsa) → mock**.
+Yeni bir aracı kurum API'si bağlanacağı zaman tek yapılacak:
 `src/lib/flights/` altına `FlightProvider` arayüzünü uygulayan yeni bir dosya ekleyip
-`provider.ts`'te sıraya almak.
+`provider.ts`'te sıraya almak. Duffel aynı zamanda gerçek biletleme (offer → order)
+desteklediği için V2'de ödeme akışı da bu API üzerinden kurulabilir.

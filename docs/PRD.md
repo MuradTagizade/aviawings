@@ -31,7 +31,7 @@ Avrupa/Körfez'e uçan gezginler; "nereye gitsem?" diyen ilham arayıcılar.
 |---|---|---|
 | 1 | Uçuş arama widget'ı | Autocomplete (TR/AZ öncelikli 28 havalimanı), çift takvim, yolcu/kabin seçici |
 | 2 | Arama sonuçları | Filtre (aktarma/havayolu/saat/fiyat), sıralama (en iyi/ucuz/hızlı), ±3 gün esnek tarih şeridi, skeleton yükleme |
-| 3 | Uçuş verisi adaptörü | `FlightProvider` arayüzü: Amadeus test API → hata/boşlukta deterministik mock'a düşer; kaynak `demo veri` rozetiyle belirtilir |
+| 3 | Uçuş verisi adaptörü | `FlightProvider` arayüzü: Duffel → Amadeus → deterministik mock sıralı fallback; mock'ta `demo veri` rozeti gösterilir. ⚠️ Amadeus Self-Service 17 Tem 2026'da kapanıyor; **Duffel** hem test hem V2 gerçek biletleme yolu olarak seçildi |
 | 4 | Rezervasyon akışı | 3 adım: yolcular (zod validasyonu) → özet → demo ödeme → animasyonlu onay; girişli kullanıcıda Supabase'e kayıt |
 | 5 | Destinasyon rehberleri | 6 şehir (Bakü, İstanbul, Ankara, İzmir, Antalya, Gence): hava durumu (Open-Meteo; >16 gün için iklim ortalaması), gezilecek yerler, etkinlikler, pratik bilgiler |
 | 6 | AI Seyahat Planlayıcı | 6 soruluk görsel quiz → Gemini 2.5 Flash (OpenRouter) → gün gün plan kartları → bağlamlı sohbet (streaming); anahtar yoksa zarif "yakında" durumu |
@@ -45,7 +45,8 @@ Avrupa/Körfez'e uçan gezginler; "nereye gitsem?" diyen ilham arayıcılar.
 ## 4. Yol Haritası
 
 ### V2 — Canlı satış
-- Aracı kurum (konsolidatör) API entegrasyonu → `FlightProvider` arayüzüne yeni adaptör
+- Aracı kurum (konsolidatör) API entegrasyonu → `FlightProvider` arayüzüne yeni adaptör.
+  Öncelikli aday: **Duffel** (offer → order akışıyla gerçek biletleme + ödeme; test adaptörü v1'de hazır)
 - Gerçek ödeme (Stripe / yerel PSP) + 3-D Secure
 - Fiyat alarmı e-posta bildirimleri (Supabase Edge Functions + cron)
 - Bilet PDF'i ve e-posta gönderimi
