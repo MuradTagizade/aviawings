@@ -431,6 +431,16 @@
     "checking": "Sorgulanıyor…",
     "updated": "Veri güncellemesi: {date}",
     "disclaimer": "Bu bilgiler açık veri kaynaklıdır ve değişiklik gösterebilir; seyahatten önce mutlaka resmî makamlardan doğrulayın.",
-    "source": "Kaynak: Passport Index açık veri seti"
+    "source": "Kaynak: Passport Index açık veri seti",
+    "modeCheck": "Ülke sorgula",
+    "modeMap": "Nereye vizesiz gidebilirim?",
+    "mapTitle": "{country} pasaportuyla gidebileceğiniz yerler",
+    "groups": {
+      "visa_free": "Vizesiz ({count} ülke)",
+      "visa_on_arrival": "Varışta vize ({count} ülke)",
+      "e_visa": "e-Vize / eTA ({count} ülke)",
+      "visa_required": "{count} ülke için önceden vize gerekiyor"
+    },
+    "daysShort": "{days} gün"
   }
 }

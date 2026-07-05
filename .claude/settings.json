@@ -36,7 +36,11 @@
       "Bash(perl -pi -e 's/bg-gradient-to-br from-ink to-sky text-cream/bg-gradient-to-br from-[#1a1a2e] to-[#35639b] text-white/' src/components/planner/planner-client.tsx)",
       "Bash(curl -s http://localhost:3130/tr)",
       "Bash(git commit -q -m 'Add elegant dark mode *)",
-      "Bash(git commit -q -m 'Add visa check feature backed by the open passport-index dataset *)"
+      "Bash(git commit -q -m 'Add visa check feature backed by the open passport-index dataset *)",
+      "Bash(curl -s \"http://localhost:3132/api/visa/map?passport=TR\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s \"http://localhost:3132/api/visa/map?passport=AZ\")",
+      "Bash(git commit -q -m 'Visa: flags in country dropdowns + '\\\\''where can I go visa-free'\\\\'' map mode *)"
     ]
   }
 }

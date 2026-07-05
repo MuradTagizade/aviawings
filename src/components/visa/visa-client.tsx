@@ -14,7 +14,7 @@ import {
   StampIcon,
   TicketCheck,
 } from "lucide-react";
-import type { VisaResult, VisaStatus } from "@/lib/visa";
+import type { VisaMapEntry, VisaResult, VisaStatus } from "@/lib/visa";
 import { cn } from "@/lib/utils";
 
 function flagEmoji(iso2: string) {
@@ -36,22 +36,24 @@ const STATUS_STYLE: Record<
   no_admission: { icon: CircleAlert, wrap: "border-ink/15 bg-sand", iconWrap: "bg-ink text-cream" },
 };
 
+interface CountryOption {
+  code: string;
+  name: string;
+}
+
 function CountrySelect({
   label,
   value,
   onChange,
   countries,
-  names,
   placeholder,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
-  countries: { code: string; name: string }[];
-  names: Intl.DisplayNames | null;
+  countries: CountryOption[];
   placeholder: string;
 }) {
-  void names;
   return (
     <div className="flex-1">
       <label className="mb-1.5 block text-[13px] font-medium text-ink-soft">
@@ -75,7 +77,7 @@ function CountrySelect({
           </option>
           {countries.map((c) => (
             <option key={c.code} value={c.code}>
-              {c.name}
+              {flagEmoji(c.code)} {c.name}
             </option>
           ))}
         </select>
@@ -91,11 +93,90 @@ function CountrySelect({
   );
 }
 
+/* ——— "Where can I go" grouped chips ——— */
+
+function MapGroups({
+  entries,
+  nameOf,
+  onPick,
+}: {
+  entries: VisaMapEntry[];
+  nameOf: (code: string) => string;
+  onPick: (code: string) => void;
+}) {
+  const t = useTranslations("visa");
+  const locale = useLocale();
+  const collator = new Intl.Collator(locale === "tr" ? "tr" : "en");
+
+  const groups: {
+    key: "visa_free" | "visa_on_arrival" | "e_visa";
+    statuses: VisaStatus[];
+    chip: string;
+    dot: string;
+  }[] = [
+    { key: "visa_free", statuses: ["visa_free"], chip: "bg-leaf-soft text-leaf hover:bg-leaf hover:text-white", dot: "bg-leaf" },
+    { key: "visa_on_arrival", statuses: ["visa_on_arrival"], chip: "bg-gold-soft text-gold-deep hover:bg-gold hover:text-white", dot: "bg-gold" },
+    { key: "e_visa", statuses: ["e_visa", "eta"], chip: "bg-sky-soft text-sky hover:bg-sky hover:text-white", dot: "bg-sky" },
+  ];
+
+  const requiredCount = entries.filter(
+    (e) => e.status === "visa_required" || e.status === "no_admission"
+  ).length;
+
+  return (
+    <div className="mt-8 space-y-8">
+      {groups.map(({ key, statuses, chip, dot }) => {
+        const list = entries
+          .filter((e) => statuses.includes(e.status))
+          .sort((a, b) => collator.compare(nameOf(a.code), nameOf(b.code)));
+        if (list.length === 0) return null;
+        return (
+          <section key={key}>
+            <h2 className="mb-3 flex items-center gap-2 text-[15px] font-semibold text-ink">
+              <span className={cn("h-2.5 w-2.5 rounded-full", dot)} />
+              {t(`groups.${key}`, { count: list.length })}
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {list.map((e, i) => (
+                <motion.button
+                  key={e.code}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: Math.min(i * 0.008, 0.35), duration: 0.25 }}
+                  onClick={() => onPick(e.code)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors",
+                    chip
+                  )}
+                >
+                  <span aria-hidden>{flagEmoji(e.code)}</span>
+                  {nameOf(e.code)}
+                  {e.days !== undefined && (
+                    <span className="opacity-70">· {t("daysShort", { days: e.days })}</span>
+                  )}
+                </motion.button>
+              ))}
+            </div>
+          </section>
+        );
+      })}
+      {requiredCount > 0 && (
+        <p className="text-sm text-ink-faint">
+          {t("groups.visa_required", { count: requiredCount })}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function VisaClient({ countryCodes }: { countryCodes: string[] }) {
   const t = useTranslations("visa");
   const locale = useLocale() as "tr" | "en";
   const sp = useSearchParams();
 
+  const [mode, setMode] = useState<"check" | "map">(
+    sp.get("mode") === "map" ? "map" : "check"
+  );
   const [passport, setPassport] = useState(
     () => sp.get("passport")?.toUpperCase() ?? (locale === "tr" ? "TR" : "")
   );
@@ -103,25 +184,26 @@ export function VisaClient({ countryCodes }: { countryCodes: string[] }) {
     () => sp.get("destination")?.toUpperCase() ?? ""
   );
 
-  const { countries, displayNames } = useMemo(() => {
+  const { countries, nameOf } = useMemo(() => {
     let dn: Intl.DisplayNames | null = null;
     try {
       dn = new Intl.DisplayNames([locale === "tr" ? "tr" : "en"], { type: "region" });
     } catch {
       // very old browsers — fall back to ISO codes
     }
+    const lookup = (code: string) => dn?.of(code) ?? code;
     const collator = new Intl.Collator(locale === "tr" ? "tr" : "en");
     const list = countryCodes
-      .map((code) => ({ code, name: dn?.of(code) ?? code }))
+      .map((code) => ({ code, name: lookup(code) }))
       .sort((a, b) => collator.compare(a.name, b.name));
-    return { countries: list, displayNames: dn };
+    return { countries: list, nameOf: lookup };
   }, [countryCodes, locale]);
 
-  const ready = passport !== "" && destination !== "";
+  const checkReady = passport !== "" && destination !== "";
 
-  const query = useQuery<VisaResult>({
+  const checkQuery = useQuery<VisaResult>({
     queryKey: ["visa", passport, destination],
-    enabled: ready,
+    enabled: mode === "check" && checkReady,
     staleTime: Infinity,
     queryFn: async () => {
       const res = await fetch(`/api/visa?passport=${passport}&destination=${destination}`);
@@ -130,10 +212,20 @@ export function VisaClient({ countryCodes }: { countryCodes: string[] }) {
     },
   });
 
-  const result = query.data;
+  const mapQuery = useQuery<{ destinations: VisaMapEntry[] }>({
+    queryKey: ["visa-map", passport],
+    enabled: mode === "map" && passport !== "",
+    staleTime: Infinity,
+    queryFn: async () => {
+      const res = await fetch(`/api/visa/map?passport=${passport}`);
+      if (!res.ok) throw new Error("visa_map_failed");
+      return res.json();
+    },
+  });
+
+  const result = checkQuery.data;
   const style = result ? STATUS_STYLE[result.status] : null;
   const StatusIcon = style?.icon ?? BadgeCheck;
-
   const statusText = result
     ? result.status === "visa_free" && result.days
       ? t("status.visa_free_days", { days: result.days })
@@ -141,7 +233,12 @@ export function VisaClient({ countryCodes }: { countryCodes: string[] }) {
     : "";
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-24 pt-28 sm:px-6">
+    <div
+      className={cn(
+        "mx-auto px-4 pb-24 pt-28 sm:px-6",
+        mode === "map" ? "max-w-4xl" : "max-w-2xl"
+      )}
+    >
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gold-soft">
           <StampIcon className="h-5 w-5 text-gold-deep" />
@@ -152,83 +249,141 @@ export function VisaClient({ countryCodes }: { countryCodes: string[] }) {
         </p>
       </motion.div>
 
+      {/* Mode switch */}
+      <div className="mt-8 flex justify-center">
+        <div className="inline-flex rounded-full bg-sand p-1">
+          {(["check", "map"] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={cn(
+                "rounded-full px-4 py-2 text-[13px] font-medium transition-all sm:px-5",
+                mode === m ? "bg-surface text-ink shadow-soft" : "text-ink-soft"
+              )}
+            >
+              {m === "check" ? t("modeCheck") : t("modeMap")}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="mt-10 rounded-2xl border border-ink/5 bg-surface p-6 shadow-card sm:p-8"
+        className="mt-8 rounded-2xl border border-ink/5 bg-surface p-6 shadow-card sm:p-8"
       >
-        <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end">
-          <CountrySelect
-            label={t("passport")}
-            value={passport}
-            onChange={setPassport}
-            countries={countries}
-            names={displayNames}
-            placeholder={t("selectCountry")}
-          />
-          <span className="hidden pb-4 text-ink-faint sm:block">
-            <ArrowRight className="h-5 w-5" />
-          </span>
-          <CountrySelect
-            label={t("destination")}
-            value={destination}
-            onChange={setDestination}
-            countries={countries}
-            names={displayNames}
-            placeholder={t("selectCountry")}
-          />
-        </div>
+        {mode === "check" ? (
+          <>
+            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-end">
+              <CountrySelect
+                label={t("passport")}
+                value={passport}
+                onChange={setPassport}
+                countries={countries}
+                placeholder={t("selectCountry")}
+              />
+              <span className="hidden pb-4 text-ink-faint sm:block">
+                <ArrowRight className="h-5 w-5" />
+              </span>
+              <CountrySelect
+                label={t("destination")}
+                value={destination}
+                onChange={setDestination}
+                countries={countries}
+                placeholder={t("selectCountry")}
+              />
+            </div>
 
-        <AnimatePresence mode="wait">
-          {ready && (
-            <motion.div
-              key={`${passport}-${destination}-${query.status}`}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3 }}
-              className="mt-6"
-            >
-              {query.isLoading && (
-                <div className="flex items-center gap-3 rounded-xl bg-sand p-5">
-                  <div className="skeleton h-10 w-10 rounded-full" />
-                  <div className="skeleton h-4 w-48 rounded" />
-                </div>
-              )}
-
-              {result && style && (
-                <div className={cn("rounded-xl border p-5", style.wrap)}>
-                  <div className="flex items-start gap-4">
-                    <span
-                      className={cn(
-                        "flex h-11 w-11 shrink-0 items-center justify-center rounded-full",
-                        style.iconWrap
-                      )}
-                    >
-                      <StatusIcon className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <p className="text-[17px] font-semibold text-ink">{statusText}</p>
-                      <p className="mt-1 text-sm leading-relaxed text-ink-soft">
-                        {t(`desc.${result.status}`)}
-                      </p>
-                      <p className="mt-3 text-xs text-ink-faint">
-                        {t("updated", { date: result.updated })} · {t("source")}
-                      </p>
+            <AnimatePresence mode="wait">
+              {checkReady && (
+                <motion.div
+                  key={`${passport}-${destination}-${checkQuery.status}`}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-6"
+                >
+                  {checkQuery.isLoading && (
+                    <div className="flex items-center gap-3 rounded-xl bg-sand p-5">
+                      <div className="skeleton h-10 w-10 rounded-full" />
+                      <div className="skeleton h-4 w-48 rounded" />
                     </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              {query.isError && (
-                <p className="rounded-xl bg-coral-soft p-4 text-sm text-coral">
-                  {t("disclaimer")}
-                </p>
+                  {result && style && (
+                    <div className={cn("rounded-xl border p-5", style.wrap)}>
+                      <div className="flex items-start gap-4">
+                        <span
+                          className={cn(
+                            "flex h-11 w-11 shrink-0 items-center justify-center rounded-full",
+                            style.iconWrap
+                          )}
+                        >
+                          <StatusIcon className="h-5 w-5" />
+                        </span>
+                        <div>
+                          <p className="text-[17px] font-semibold text-ink">{statusText}</p>
+                          <p className="mt-1 text-sm leading-relaxed text-ink-soft">
+                            {t(`desc.${result.status}`)}
+                          </p>
+                          <p className="mt-3 text-xs text-ink-faint">
+                            {t("updated", { date: result.updated })} · {t("source")}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {checkQuery.isError && (
+                    <p className="rounded-xl bg-coral-soft p-4 text-sm text-coral">
+                      {t("disclaimer")}
+                    </p>
+                  )}
+                </motion.div>
               )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </AnimatePresence>
+          </>
+        ) : (
+          <>
+            <div className="sm:max-w-sm">
+              <CountrySelect
+                label={t("passport")}
+                value={passport}
+                onChange={setPassport}
+                countries={countries}
+                placeholder={t("selectCountry")}
+              />
+            </div>
+
+            {passport && (
+              <p className="mt-6 font-display text-xl text-ink">
+                {t("mapTitle", { country: nameOf(passport) })}
+              </p>
+            )}
+
+            {mapQuery.isLoading && (
+              <div className="mt-6 flex flex-wrap gap-2">
+                {Array.from({ length: 18 }).map((_, i) => (
+                  <div key={i} className="skeleton h-8 w-28 rounded-full" />
+                ))}
+              </div>
+            )}
+
+            {mapQuery.data && (
+              <MapGroups
+                entries={mapQuery.data.destinations}
+                nameOf={nameOf}
+                onPick={(code) => {
+                  setDestination(code);
+                  setMode("check");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              />
+            )}
+          </>
+        )}
       </motion.div>
 
       <p className="mx-auto mt-6 max-w-lg text-center text-xs leading-relaxed text-ink-faint">

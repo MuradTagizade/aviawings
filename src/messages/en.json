@@ -431,6 +431,16 @@
     "checking": "Checking…",
     "updated": "Data updated: {date}",
     "disclaimer": "This information comes from open data and can change; always verify with official sources before you travel.",
-    "source": "Source: Passport Index open dataset"
+    "source": "Source: Passport Index open dataset",
+    "modeCheck": "Check a country",
+    "modeMap": "Where can I go visa-free?",
+    "mapTitle": "Where your {country} passport can take you",
+    "groups": {
+      "visa_free": "Visa-free ({count} countries)",
+      "visa_on_arrival": "Visa on arrival ({count} countries)",
+      "e_visa": "e-Visa / eTA ({count} countries)",
+      "visa_required": "{count} countries require a visa in advance"
+    },
+    "daysShort": "{days} days"
   }
 }
