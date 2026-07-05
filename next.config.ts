@@ -13,7 +13,7 @@ const csp = [
   "img-src 'self' data: blob: https://images.unsplash.com https://upload.wikimedia.org https://www.google-analytics.com https://www.googletagmanager.com https://www.facebook.com",
   "font-src 'self' data:",
   "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://www.facebook.com",
-  "frame-src 'self' https://www.googletagmanager.com",
+  "frame-src 'self' https://www.googletagmanager.com https://www.google.com https://maps.google.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

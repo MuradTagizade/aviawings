@@ -14,12 +14,13 @@ const planBody = z.object({
   mode: z.literal("plan"),
   locale: z.enum(["tr", "en"]),
   answers: z.object({
-    destination: z.string().max(60),
+    destination: z.string().min(2).max(80),
+    when: z.string().max(30).default("flexible"),
     style: z.string().max(60),
     pace: z.string().max(60),
     company: z.string().max(60),
     budget: z.string().max(60),
-    days: z.number().int().min(2).max(7),
+    days: z.number().int().min(2).max(10),
   }),
 });
 
@@ -96,7 +97,7 @@ export async function POST(req: Request) {
             { role: "user", content: plannerUserPrompt(body.answers, body.locale) },
           ],
           temperature: 0.8,
-          max_tokens: 4000,
+          max_tokens: 8000,
         }),
       });
       if (!res.ok) {

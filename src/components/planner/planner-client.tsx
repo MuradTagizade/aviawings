@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -8,16 +8,26 @@ import { AnimatePresence, motion } from "motion/react";
 import {
   ArrowLeft,
   ArrowRight,
+  Banknote,
+  CalendarHeart,
   Compass,
+  Download,
+  ExternalLink,
+  FileText,
   Landmark,
+  Languages,
   Lightbulb,
+  Luggage,
+  MapPin,
   Martini,
+  MessageCircleHeart,
   Minus,
   Moon,
   MountainSnow,
   Palette,
   Plane,
   Plus,
+  Route,
   Send,
   ShoppingBag,
   Sparkles,
@@ -28,8 +38,14 @@ import {
   Wand2,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { DESTINATIONS, findDestination } from "@/content/destinations";
+import { findAirport } from "@/lib/airports";
 import { trackEvent } from "@/lib/analytics";
+import {
+  buildExportHtml,
+  downloadHtmlFile,
+  printAsPdf,
+  type ExportPlan,
+} from "@/lib/plan-export";
 import { addDays, cn, formatDateISO } from "@/lib/utils";
 
 /* ——— Types ——— */
@@ -39,14 +55,30 @@ interface PlanItem {
   title: string;
   description: string;
   category: string;
+  wikiQuery?: string;
+  mapQuery?: string;
+  durationHint?: string;
 }
 
 interface Plan {
   title: string;
   destination: string;
+  country: string;
+  heroWikiQuery?: string;
   summary: string;
+  stats: { bestTime: string; language: string; currency: string };
   days: { day: number; theme: string; items: PlanItem[] }[];
-  tips: string[];
+  budget?: { currency: string; perDayLow: number; perDayHigh: number; note: string };
+  packing?: string[];
+  phrases?: { local: string; meaning: string }[];
+  tips?: string[];
+}
+
+interface WikiInfo {
+  title: string;
+  extract: string;
+  thumbnail?: string;
+  url?: string;
 }
 
 interface ChatMessage {
@@ -68,6 +100,14 @@ const CATEGORY_ICONS: Record<string, typeof Landmark> = {
 
 const PART_ICONS = { morning: Sun, afternoon: Sunset, evening: Moon } as const;
 
+const DESTINATION_SUGGESTIONS = [
+  "Bakü", "İstanbul", "Kapadokya", "Antalya", "Tiflis", "Dubai",
+  "Paris", "Roma", "Barselona", "Londra", "Prag", "Viyana",
+  "Tokyo", "Bali", "New York", "Santorini", "Maldivler", "İsviçre",
+];
+
+/* ——— Component ——— */
+
 export function PlannerClient() {
   const t = useTranslations("planner");
   const tq = useTranslations("planner.quiz");
@@ -75,12 +115,12 @@ export function PlannerClient() {
   const sp = useSearchParams();
 
   const presetDest = sp.get("destination");
-  const preset = presetDest ? findDestination(presetDest) : undefined;
 
   const [stage, setStage] = useState<Stage>("quiz");
-  const [step, setStep] = useState(preset ? 1 : 0);
+  const [step, setStep] = useState(presetDest ? 1 : 0);
   const [answers, setAnswers] = useState({
-    destination: preset ? preset.city.en : "",
+    destination: presetDest ?? "",
+    when: "flexible",
     style: "",
     pace: "",
     company: "",
@@ -88,6 +128,7 @@ export function PlannerClient() {
     days: 4,
   });
   const [plan, setPlan] = useState<Plan | null>(null);
+  const [wiki, setWiki] = useState<Record<string, WikiInfo>>({});
   const [error, setError] = useState(false);
 
   /* Chat state */
@@ -95,6 +136,16 @@ export function PlannerClient() {
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const months = useMemo(() => {
+    const fmt = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
+      month: "long",
+    });
+    const now = new Date();
+    return Array.from({ length: 12 }, (_, i) =>
+      fmt.format(new Date(now.getFullYear(), now.getMonth() + i, 1))
+    );
+  }, [locale]);
 
   const styleOptions = useMemo(
     () => [
@@ -106,7 +157,6 @@ export function PlannerClient() {
     ],
     [tq]
   );
-
   const paceOptions = [
     { key: "relaxed", label: tq("paceRelaxed"), text: tq("paceRelaxedText") },
     { key: "balanced", label: tq("paceBalanced"), text: tq("paceBalancedText") },
@@ -124,11 +174,14 @@ export function PlannerClient() {
     { key: "luxury", label: tq("budgetLuxury"), text: tq("budgetLuxuryText") },
   ];
 
-  const TOTAL_STEPS = 6;
+  const TOTAL_STEPS = 7;
+
+  /* ——— Plan generation ——— */
 
   async function generate(finalAnswers: typeof answers) {
     setStage("generating");
     setError(false);
+    setWiki({});
     trackEvent("ai_plan_requested", { destination: finalAnswers.destination });
     try {
       const res = await fetch("/api/ai/chat", {
@@ -153,6 +206,41 @@ export function PlannerClient() {
     }
   }
 
+  /* ——— Wikipedia enrichment (images + extracts) ——— */
+
+  useEffect(() => {
+    if (!plan) return;
+    const queries = new Set<string>();
+    if (plan.heroWikiQuery) queries.add(plan.heroWikiQuery);
+    plan.days.forEach((d) =>
+      d.items.forEach((i) => i.wikiQuery && queries.add(i.wikiQuery))
+    );
+    let cancelled = false;
+    const list = [...queries];
+    let idx = 0;
+
+    async function worker() {
+      while (idx < list.length && !cancelled) {
+        const q = list[idx++];
+        try {
+          const res = await fetch(`/api/wiki?q=${encodeURIComponent(q)}&lang=${locale}`);
+          if (res.ok) {
+            const info: WikiInfo = await res.json();
+            if (!cancelled) setWiki((w) => ({ ...w, [q]: info }));
+          }
+        } catch {
+          // enrichment is best-effort
+        }
+      }
+    }
+    Promise.all(Array.from({ length: 4 }, worker));
+    return () => {
+      cancelled = true;
+    };
+  }, [plan, locale]);
+
+  /* ——— Chat ——— */
+
   async function sendChat() {
     const text = input.trim();
     if (!text || streaming) return;
@@ -165,6 +253,7 @@ export function PlannerClient() {
       ? JSON.stringify({
           title: plan.title,
           destination: plan.destination,
+          country: plan.country,
           days: plan.days.map((d) => ({
             day: d.day,
             theme: d.theme,
@@ -202,18 +291,89 @@ export function PlannerClient() {
     }
   }
 
-  /* Find flights link for the plan's destination */
-  const planDest = useMemo(() => {
+  /* ——— Flights link + export ——— */
+
+  const flightDest = useMemo(() => {
     if (!plan) return undefined;
-    const norm = plan.destination.toLocaleLowerCase();
-    return DESTINATIONS.find(
-      (d) =>
-        norm.includes(d.city.en.toLocaleLowerCase()) ||
-        norm.includes(d.city.tr.toLocaleLowerCase("tr-TR"))
-    );
+    const norm = `${plan.destination} ${plan.country}`.toLocaleLowerCase();
+    const codes = ["GYD", "GNJ", "IST", "ESB", "ADB", "AYT", "TBS", "DXB", "LHR", "CDG", "FCO", "BCN", "AMS", "VIE", "BER", "FRA", "JFK", "DOH"];
+    for (const code of codes) {
+      const a = findAirport(code);
+      if (!a) continue;
+      if (
+        norm.includes(a.city.en.toLocaleLowerCase()) ||
+        norm.includes(a.city.tr.toLocaleLowerCase("tr-TR"))
+      ) {
+        return a;
+      }
+    }
+    return undefined;
   }, [plan]);
 
-  /* ——— Render ——— */
+  function toExportPlan(): ExportPlan | null {
+    if (!plan) return null;
+    return {
+      title: plan.title,
+      destination: plan.destination,
+      country: plan.country,
+      summary: plan.summary,
+      heroImage: plan.heroWikiQuery ? wiki[plan.heroWikiQuery]?.thumbnail : undefined,
+      stats: plan.stats,
+      days: plan.days.map((d) => ({
+        day: d.day,
+        theme: d.theme,
+        items: d.items.map((i) => ({
+          part: i.part,
+          title: i.title,
+          description: i.description,
+          durationHint: i.durationHint,
+          mapQuery: i.mapQuery,
+          image: i.wikiQuery ? wiki[i.wikiQuery]?.thumbnail : undefined,
+        })),
+      })),
+      budget: plan.budget,
+      packing: plan.packing ?? [],
+      phrases: plan.phrases ?? [],
+      tips: plan.tips ?? [],
+    };
+  }
+
+  function exportLabels() {
+    return {
+      day: t("day1"),
+      bestTime: t("statsBestTime"),
+      language: t("statsLanguage"),
+      currency: t("statsCurrency"),
+      budgetTitle: t("budgetTitle"),
+      budgetPerPerson: t("budgetPerPerson"),
+      packingTitle: t("packingTitle"),
+      phrasesTitle: t("phrasesTitle"),
+      tipsTitle: t("tipsTitle"),
+      viewOnMap: t("viewOnMap"),
+      preparedBy: t("preparedBy"),
+      disclaimer: t("disclaimer"),
+      duration: t("duration"),
+    };
+  }
+
+  function handleDownloadHtml() {
+    const ep = toExportPlan();
+    if (!ep) return;
+    trackEvent("plan_export", { format: "html" });
+    const slug = ep.destination
+      .toLocaleLowerCase()
+      .replace(/[^a-z0-9ğüşöçıə]+/gi, "-");
+    downloadHtmlFile(buildExportHtml(ep, exportLabels(), locale), `aviawings-${slug}.html`);
+  }
+
+  function handleDownloadPdf() {
+    const ep = toExportPlan();
+    if (!ep) return;
+    trackEvent("plan_export", { format: "pdf" });
+    printAsPdf(buildExportHtml(ep, exportLabels(), locale));
+  }
+
+  /* ═══════════ Render ═══════════ */
 
   if (stage === "unavailable") {
     return (
@@ -233,7 +393,6 @@ export function PlannerClient() {
         <div className="relative mx-auto h-24 w-64">
           <svg viewBox="0 0 260 80" className="absolute inset-0">
             <path
-              id="flightpath"
               d="M10 65 Q 130 -10 250 55"
               fill="none"
               stroke="#c9a96e"
@@ -259,73 +418,335 @@ export function PlannerClient() {
     );
   }
 
+  /* ——— Plan view ——— */
   if (stage === "plan" && plan) {
+    const hero = plan.heroWikiQuery ? wiki[plan.heroWikiQuery] : undefined;
     const depart = formatDateISO(addDays(new Date(), 14));
     const ret = formatDateISO(addDays(new Date(), 14 + answers.days));
+    const totalQueries =
+      (plan.heroWikiQuery ? 1 : 0) +
+      plan.days.reduce((a, d) => a + d.items.filter((i) => i.wikiQuery).length, 0);
+    const enriching = Object.keys(wiki).length < Math.min(totalQueries, 4);
+
     return (
-      <div className="mx-auto max-w-4xl px-4 pb-24 pt-28 sm:px-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-deep">
-            {t("yourPlan")} · {plan.destination}
-          </p>
-          <h1 className="mt-2 font-display text-4xl text-ink sm:text-5xl">{plan.title}</h1>
-          <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
-            {plan.summary}
-          </p>
+      <div className="mx-auto max-w-4xl px-4 pb-24 pt-24 sm:px-6">
+        {/* ——— Hero card ——— */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="overflow-hidden rounded-3xl border border-ink/5 bg-surface shadow-card"
+        >
+          <div className="relative h-56 bg-sand sm:h-72">
+            {hero?.thumbnail ? (
+              <Image
+                src={hero.thumbnail}
+                alt={plan.destination}
+                fill
+                unoptimized
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <Plane className="h-10 w-10 text-ink-faint/40" />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+                {plan.destination} · {plan.country}
+              </p>
+              <h1 className="mt-1 font-display text-3xl text-white sm:text-4xl">
+                {plan.title}
+              </h1>
+            </div>
+          </div>
+
+          <div className="p-6 sm:p-8">
+            <p className="text-[15px] leading-relaxed text-ink-soft">{plan.summary}</p>
+
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {[
+                { icon: CalendarHeart, label: t("statsBestTime"), value: plan.stats.bestTime },
+                { icon: Languages, label: t("statsLanguage"), value: plan.stats.language },
+                { icon: Banknote, label: t("statsCurrency"), value: plan.stats.currency },
+              ].map(({ icon: Icon, label, value }) => (
+                <div
+                  key={label}
+                  className="flex items-center gap-3 rounded-xl bg-sand/70 px-4 py-3"
+                >
+                  <Icon className="h-4.5 w-4.5 shrink-0 text-gold-deep" />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
+                      {label}
+                    </p>
+                    <p className="truncate text-sm font-medium text-ink">{value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={handleDownloadPdf}
+                className="inline-flex h-10 items-center gap-2 rounded-full bg-ink px-5 text-[13px] font-semibold text-cream transition-all hover:bg-ink/90 hover:shadow-lift"
+              >
+                <FileText className="h-4 w-4" />
+                {t("downloadPdf")}
+              </button>
+              <button
+                onClick={handleDownloadHtml}
+                className="inline-flex h-10 items-center gap-2 rounded-full border border-ink/15 px-5 text-[13px] font-medium text-ink transition-all hover:border-ink/40"
+              >
+                <Download className="h-4 w-4" />
+                {t("downloadHtml")}
+              </button>
+              {flightDest && (
+                <Link
+                  href={`/flights?from=${flightDest.iata === "GYD" || flightDest.iata === "GNJ" ? "IST" : "GYD"}&to=${flightDest.iata}&depart=${depart}&return=${ret}&adults=1&children=0&infants=0&cabin=economy`}
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-gold px-5 text-[13px] font-semibold text-white transition-all hover:bg-gold-deep hover:shadow-lift"
+                >
+                  <Plane className="h-4 w-4" />
+                  {t("findFlights")}
+                </Link>
+              )}
+              <button
+                onClick={() => {
+                  setPlan(null);
+                  setStage("quiz");
+                  setStep(0);
+                }}
+                className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-[13px] font-medium text-ink-soft transition-colors hover:bg-sand"
+              >
+                <Wand2 className="h-4 w-4" />
+                {t("regenerate")}
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-ink-faint">{t("exportNote")}</p>
+            {enriching && (
+              <p className="mt-1 flex items-center gap-1.5 text-xs text-gold-deep">
+                <motion.span
+                  animate={{ opacity: [0.4, 1, 0.4] }}
+                  transition={{ repeat: Infinity, duration: 1.4 }}
+                >
+                  ✦
+                </motion.span>
+                {t("enriching")}
+              </p>
+            )}
+          </div>
         </motion.div>
 
-        <div className="mt-10 space-y-6">
-          {plan.days.map((day, di) => (
-            <motion.section
-              key={day.day}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.5, delay: Math.min(di * 0.08, 0.3) }}
-              className="overflow-hidden rounded-2xl border border-ink/5 bg-surface shadow-soft"
-            >
-              <div className="flex items-center gap-4 border-b border-ink/5 bg-sand/50 px-6 py-4">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-ink font-display text-lg text-cream">
-                  {day.day}
-                </span>
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-faint">
-                    {t("day", { day: day.day })}
-                  </p>
-                  <h2 className="font-semibold text-ink">{day.theme}</h2>
+        {/* ——— Days ——— */}
+        <div className="mt-8 space-y-6">
+          {plan.days.map((day, di) => {
+            const routeUrl = `https://www.google.com/maps/dir/${day.items
+              .filter((i) => i.mapQuery)
+              .map((i) => encodeURIComponent(i.mapQuery!))
+              .join("/")}`;
+            return (
+              <motion.section
+                key={day.day}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.5, delay: Math.min(di * 0.06, 0.25) }}
+                className="overflow-hidden rounded-2xl border border-ink/5 bg-surface shadow-soft"
+              >
+                <div className="flex flex-wrap items-center gap-4 border-b border-ink/5 bg-sand/50 px-6 py-4">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-ink font-display text-lg text-cream">
+                    {day.day}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-ink-faint">
+                      {t("day", { day: day.day })}
+                    </p>
+                    <h2 className="truncate font-semibold text-ink">{day.theme}</h2>
+                  </div>
+                  <a
+                    href={routeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-9 items-center gap-1.5 rounded-full border border-gold/40 bg-gold-soft/50 px-4 text-[12px] font-semibold text-gold-deep transition-all hover:bg-gold hover:text-white"
+                  >
+                    <Route className="h-3.5 w-3.5" />
+                    {t("openDayRoute")}
+                  </a>
                 </div>
-              </div>
-              <div className="divide-y divide-ink/5">
-                {day.items.map((item, ii) => {
-                  const CatIcon = CATEGORY_ICONS[item.category] ?? Compass;
-                  const PartIcon = PART_ICONS[item.part] ?? Sun;
-                  return (
-                    <div key={ii} className="flex gap-4 px-6 py-4">
-                      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-soft">
-                        <PartIcon className="h-4 w-4 text-gold-deep" />
-                      </span>
-                      <div>
-                        <h3 className="flex items-center gap-2 font-medium text-ink">
-                          {item.title}
-                          <CatIcon className="h-3.5 w-3.5 text-ink-faint" />
-                        </h3>
-                        <p className="mt-1 text-sm leading-relaxed text-ink-soft">
-                          {item.description}
-                        </p>
+
+                <div className="divide-y divide-ink/5">
+                  {day.items.map((item, ii) => {
+                    const CatIcon = CATEGORY_ICONS[item.category] ?? Compass;
+                    const PartIcon = PART_ICONS[item.part] ?? Sun;
+                    const info = item.wikiQuery ? wiki[item.wikiQuery] : undefined;
+                    return (
+                      <div key={ii} className="flex gap-4 p-5 sm:gap-5 sm:p-6">
+                        <div className="relative hidden h-28 w-28 shrink-0 overflow-hidden rounded-xl bg-sand sm:block">
+                          {info?.thumbnail ? (
+                            <Image
+                              src={info.thumbnail}
+                              alt={item.title}
+                              fill
+                              unoptimized
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center">
+                              <CatIcon className="h-6 w-6 text-ink-faint/40" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-soft">
+                              <PartIcon className="h-3.5 w-3.5 text-gold-deep" />
+                            </span>
+                            <h3 className="truncate font-semibold text-ink">{item.title}</h3>
+                          </div>
+                          <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+                            {item.description}
+                          </p>
+                          {info?.extract && (
+                            <p className="mt-2 line-clamp-2 border-l-2 border-gold/40 pl-3 text-[13px] italic leading-relaxed text-ink-faint">
+                              {info.extract}
+                            </p>
+                          )}
+                          <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-ink-faint">
+                            {item.durationHint && <span>⏱ {item.durationHint}</span>}
+                            {item.mapQuery && (
+                              <a
+                                href={`https://www.google.com/maps/search/${encodeURIComponent(item.mapQuery)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 font-medium text-gold-deep hover:underline"
+                              >
+                                <MapPin className="h-3 w-3" />
+                                {t("viewOnMap")}
+                              </a>
+                            )}
+                            {info?.url && (
+                              <a
+                                href={info.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 hover:underline"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                                {t("wikiSource")}
+                              </a>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.section>
-          ))}
+                    );
+                  })}
+                </div>
+              </motion.section>
+            );
+          })}
         </div>
 
-        {plan.tips?.length > 0 && (
-          <div className="mt-8 rounded-2xl bg-gold-soft/40 p-6">
+        {/* ——— Embedded map ——— */}
+        <motion.section
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          className="mt-8 overflow-hidden rounded-2xl border border-ink/5 bg-surface shadow-soft"
+        >
+          <h2 className="flex items-center gap-2 px-6 pt-5 font-semibold text-ink">
+            <MapPin className="h-4.5 w-4.5 text-gold-deep" />
+            {t("mapTitle")}
+          </h2>
+          <div className="mt-4 h-80">
+            <iframe
+              title={t("mapTitle")}
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(`${plan.destination}, ${plan.country}`)}&z=12&hl=${locale}&output=embed`}
+              className="h-full w-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        </motion.section>
+
+        {/* ——— Budget & Packing ——— */}
+        <div className="mt-8 grid gap-6 sm:grid-cols-2">
+          {plan.budget && (
+            <motion.section
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft"
+            >
+              <h2 className="flex items-center gap-2 font-semibold text-ink">
+                <Banknote className="h-4.5 w-4.5 text-gold-deep" />
+                {t("budgetTitle")}
+              </h2>
+              <p className="mt-3 font-display text-3xl text-ink">
+                {plan.budget.perDayLow}–{plan.budget.perDayHigh}{" "}
+                <span className="text-xl">{plan.budget.currency}</span>
+              </p>
+              <p className="text-xs text-ink-faint">{t("budgetPerPerson")}</p>
+              <p className="mt-3 text-sm leading-relaxed text-ink-soft">{plan.budget.note}</p>
+            </motion.section>
+          )}
+
+          {plan.packing && plan.packing.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.06 }}
+              className="rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft"
+            >
+              <h2 className="flex items-center gap-2 font-semibold text-ink">
+                <Luggage className="h-4.5 w-4.5 text-gold-deep" />
+                {t("packingTitle")}
+              </h2>
+              <ul className="mt-3 space-y-1.5">
+                {plan.packing.map((p, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-ink-soft">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
+                    {p}
+                  </li>
+                ))}
+              </ul>
+            </motion.section>
+          )}
+        </div>
+
+        {/* ——— Phrases ——— */}
+        {plan.phrases && plan.phrases.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-6 rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft"
+          >
+            <h2 className="flex items-center gap-2 font-semibold text-ink">
+              <MessageCircleHeart className="h-4.5 w-4.5 text-gold-deep" />
+              {t("phrasesTitle")}
+            </h2>
+            <div className="mt-3 divide-y divide-ink/5">
+              {plan.phrases.map((p, i) => (
+                <div key={i} className="flex items-baseline justify-between gap-4 py-2.5">
+                  <span className="font-medium text-ink">{p.local}</span>
+                  <span className="text-right text-sm text-ink-soft">{p.meaning}</span>
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {/* ——— Tips ——— */}
+        {plan.tips && plan.tips.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-6 rounded-2xl bg-gold-soft/40 p-6"
+          >
             <h2 className="flex items-center gap-2 font-semibold text-ink">
               <Lightbulb className="h-4.5 w-4.5 text-gold-deep" />
-              {locale === "tr" ? "Yerel ipuçları" : "Local tips"}
+              {t("tipsTitle")}
             </h2>
             <ul className="mt-3 space-y-2">
               {plan.tips.map((tip, i) => (
@@ -335,34 +756,11 @@ export function PlannerClient() {
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.section>
         )}
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          {planDest && (
-            <Link
-              href={`/flights?from=${planDest.iata === "GYD" || planDest.iata === "GNJ" ? "IST" : "GYD"}&to=${planDest.iata}&depart=${depart}&return=${ret}&adults=1&children=0&infants=0&cabin=economy`}
-              className="inline-flex h-12 items-center gap-2 rounded-full bg-gold px-7 text-[15px] font-semibold text-white transition-all hover:bg-gold-deep hover:shadow-lift"
-            >
-              <Plane className="h-4 w-4" />
-              {t("findFlights")}
-            </Link>
-          )}
-          <button
-            onClick={() => {
-              setPlan(null);
-              setStage("quiz");
-              setStep(0);
-            }}
-            className="inline-flex h-12 items-center gap-2 rounded-full border border-ink/15 px-7 text-[15px] font-medium text-ink transition-all hover:border-ink/40"
-          >
-            <Wand2 className="h-4 w-4" />
-            {t("regenerate")}
-          </button>
-        </div>
-
         {/* ——— Chat ——— */}
-        <div className="mt-14 rounded-2xl border border-ink/5 bg-surface shadow-soft">
+        <div className="mt-10 rounded-2xl border border-ink/5 bg-surface shadow-soft">
           <div className="border-b border-ink/5 px-6 py-4">
             <h2 className="flex items-center gap-2 font-semibold text-ink">
               <Sparkles className="h-4 w-4 text-gold-deep" />
@@ -425,7 +823,8 @@ export function PlannerClient() {
 
   /* ——— Quiz ——— */
   const canProceed = [
-    answers.destination !== "",
+    answers.destination.trim().length >= 2,
+    true, // month is optional (defaults to flexible)
     answers.style !== "",
     answers.pace !== "",
     answers.company !== "",
@@ -443,7 +842,6 @@ export function PlannerClient() {
         <p className="mx-auto mt-2 max-w-md text-[15px] text-ink-soft">{t("subtitle")}</p>
       </div>
 
-      {/* Progress dots */}
       <div className="mt-8 flex justify-center gap-2">
         {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
           <span
@@ -464,9 +862,8 @@ export function PlannerClient() {
         </p>
       )}
 
-      <div className="mt-10 min-h-[380px]">
+      <div className="mt-10 min-h-[340px]">
         <AnimatePresence mode="wait">
-          {/* Step 0: destination */}
           {step === 0 && (
             <motion.div
               key="s0"
@@ -475,54 +872,94 @@ export function PlannerClient() {
               exit={{ opacity: 0, x: -32 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="mb-6 text-center font-display text-2xl text-ink">
-                {tq("destination")}
+              <h2 className="mb-2 text-center font-display text-2xl text-ink">
+                {t("quizDestination")}
               </h2>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {DESTINATIONS.map((d) => (
+              <p className="mb-6 text-center text-sm text-ink-faint">
+                {t("destinationHint")}
+              </p>
+              <div className="mx-auto max-w-lg">
+                <div className="relative">
+                  <MapPin className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gold-deep" />
+                  <input
+                    value={answers.destination}
+                    onChange={(e) =>
+                      setAnswers((a) => ({ ...a, destination: e.target.value }))
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && answers.destination.trim().length >= 2) {
+                        setStep(1);
+                      }
+                    }}
+                    placeholder={t("destinationPlaceholder")}
+                    className="h-16 w-full rounded-2xl border border-ink/10 bg-surface pl-12 pr-4 text-lg text-ink shadow-soft outline-none transition-colors placeholder:text-ink-faint focus:border-gold focus:ring-2 focus:ring-gold/20"
+                    autoFocus
+                  />
+                </div>
+                <div className="mt-4 flex flex-wrap justify-center gap-2">
+                  {DESTINATION_SUGGESTIONS.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setAnswers((a) => ({ ...a, destination: s }))}
+                      className={cn(
+                        "rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-all",
+                        answers.destination === s
+                          ? "border-gold bg-gold-soft text-gold-deep"
+                          : "border-ink/10 bg-surface text-ink-soft hover:border-gold/50"
+                      )}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 1 && (
+            <motion.div
+              key="s1"
+              initial={{ opacity: 0, x: 32 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -32 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="mb-6 text-center font-display text-2xl text-ink">
+                {t("quizWhen")}
+              </h2>
+              <div className="mx-auto grid max-w-lg grid-cols-3 gap-2 sm:grid-cols-4">
+                {months.map((m) => (
                   <button
-                    key={d.slug}
-                    onClick={() => setAnswers((a) => ({ ...a, destination: d.city.en }))}
+                    key={m}
+                    onClick={() => setAnswers((a) => ({ ...a, when: m }))}
                     className={cn(
-                      "group relative h-32 overflow-hidden rounded-2xl text-left transition-all",
-                      answers.destination === d.city.en
-                        ? "ring-3 ring-gold ring-offset-2 ring-offset-cream"
-                        : "hover:scale-[1.02]"
+                      "rounded-xl border px-2 py-3 text-sm font-medium capitalize transition-all",
+                      answers.when === m
+                        ? "border-gold bg-gold-soft text-gold-deep"
+                        : "border-ink/10 bg-surface text-ink-soft hover:border-ink/25"
                     )}
                   >
-                    <Image
-                      src={d.cardImage}
-                      alt={d.city[locale]}
-                      fill
-                      sizes="200px"
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                    <span className="absolute bottom-3 left-3 font-display text-lg text-white">
-                      {d.city[locale]}
-                    </span>
+                    {m}
                   </button>
                 ))}
                 <button
-                  onClick={() => setAnswers((a) => ({ ...a, destination: "surprise" }))}
+                  onClick={() => setAnswers((a) => ({ ...a, when: "flexible" }))}
                   className={cn(
-                    "flex h-32 flex-col items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-[#1a1a2e] to-[#35639b] text-white transition-all",
-                    answers.destination === "surprise"
-                      ? "ring-3 ring-gold ring-offset-2 ring-offset-cream"
-                      : "hover:scale-[1.02]"
+                    "col-span-3 rounded-xl border px-3 py-3 text-sm font-medium transition-all sm:col-span-4",
+                    answers.when === "flexible"
+                      ? "border-gold bg-gold-soft text-gold-deep"
+                      : "border-ink/10 bg-surface text-ink-soft hover:border-ink/25"
                   )}
                 >
-                  <Wand2 className="h-5 w-5 text-gold" />
-                  <span className="font-display text-lg">{tq("destinationAny")}</span>
+                  {t("whenFlexible")}
                 </button>
               </div>
             </motion.div>
           )}
 
-          {/* Step 1: style */}
-          {step === 1 && (
+          {step === 2 && (
             <motion.div
-              key="s1"
+              key="s2"
               initial={{ opacity: 0, x: 32 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -32 }}
@@ -554,10 +991,9 @@ export function PlannerClient() {
             </motion.div>
           )}
 
-          {/* Step 2: pace */}
-          {step === 2 && (
+          {step === 3 && (
             <motion.div
-              key="s2"
+              key="s3"
               initial={{ opacity: 0, x: 32 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -32 }}
@@ -584,10 +1020,9 @@ export function PlannerClient() {
             </motion.div>
           )}
 
-          {/* Step 3: company */}
-          {step === 3 && (
+          {step === 4 && (
             <motion.div
-              key="s3"
+              key="s4"
               initial={{ opacity: 0, x: 32 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -32 }}
@@ -615,10 +1050,9 @@ export function PlannerClient() {
             </motion.div>
           )}
 
-          {/* Step 4: budget */}
-          {step === 4 && (
+          {step === 5 && (
             <motion.div
-              key="s4"
+              key="s5"
               initial={{ opacity: 0, x: 32 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -32 }}
@@ -645,10 +1079,9 @@ export function PlannerClient() {
             </motion.div>
           )}
 
-          {/* Step 5: days */}
-          {step === 5 && (
+          {step === 6 && (
             <motion.div
-              key="s5"
+              key="s6"
               initial={{ opacity: 0, x: 32 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -32 }}
@@ -666,7 +1099,7 @@ export function PlannerClient() {
                 </button>
                 <span className="w-20 font-display text-6xl text-ink">{answers.days}</span>
                 <button
-                  onClick={() => setAnswers((a) => ({ ...a, days: Math.min(7, a.days + 1) }))}
+                  onClick={() => setAnswers((a) => ({ ...a, days: Math.min(10, a.days + 1) }))}
                   className="flex h-12 w-12 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors hover:border-gold hover:text-gold-deep"
                   aria-label="+"
                 >
@@ -678,7 +1111,6 @@ export function PlannerClient() {
         </AnimatePresence>
       </div>
 
-      {/* Quiz nav */}
       <div className="mt-8 flex items-center justify-between">
         <button
           onClick={() => setStep((s) => Math.max(0, s - 1))}
