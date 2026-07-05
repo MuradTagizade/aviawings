@@ -132,7 +132,7 @@ export function FlightCard({
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, delay: Math.min(index * 0.05, 0.4), ease: [0.22, 1, 0.36, 1] }}
-      className="overflow-hidden rounded-2xl border border-ink/5 bg-white shadow-soft transition-shadow hover:shadow-card"
+      className="overflow-hidden rounded-2xl border border-ink/5 bg-surface shadow-soft transition-shadow hover:shadow-card"
     >
       <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
         <div className="flex-1 space-y-4">
@@ -236,11 +236,11 @@ export function FlightCard({
               ))}
 
               <div className="flex flex-wrap gap-2 border-t border-ink/5 pt-4">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-ink-soft shadow-soft">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1.5 text-xs font-medium text-ink-soft shadow-soft">
                   <Briefcase className="h-3.5 w-3.5 text-gold-deep" />
                   {t("cabinBaggage", { kg: offer.baggage.cabinKg })}
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-ink-soft shadow-soft">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1.5 text-xs font-medium text-ink-soft shadow-soft">
                   <Luggage className="h-3.5 w-3.5 text-gold-deep" />
                   {offer.baggage.checkedKg > 0
                     ? t("baggage", { kg: offer.baggage.checkedKg })

@@ -52,7 +52,7 @@ interface AlertRow {
 
 function EmptyState({ title, sub }: { title: string; sub: string }) {
   return (
-    <div className="rounded-2xl border border-ink/5 bg-white p-12 text-center shadow-soft">
+    <div className="rounded-2xl border border-ink/5 bg-surface p-12 text-center shadow-soft">
       <p className="font-display text-xl text-ink">{title}</p>
       <p className="mx-auto mt-2 max-w-sm text-sm text-ink-soft">{sub}</p>
     </div>
@@ -230,7 +230,7 @@ export function AccountClient() {
                 return (
                   <div
                     key={b.id}
-                    className="flex items-center gap-4 rounded-2xl border border-ink/5 bg-white p-5 shadow-soft"
+                    className="flex items-center gap-4 rounded-2xl border border-ink/5 bg-surface p-5 shadow-soft"
                   >
                     <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gold-soft">
                       <Plane className="h-5 w-5 text-gold-deep" />
@@ -271,7 +271,7 @@ export function AccountClient() {
                 return (
                   <div
                     key={f.id}
-                    className="flex items-center gap-3 rounded-2xl border border-ink/5 bg-white p-4 shadow-soft"
+                    className="flex items-center gap-3 rounded-2xl border border-ink/5 bg-surface p-4 shadow-soft"
                   >
                     <Heart className="h-4.5 w-4.5 shrink-0 fill-coral text-coral" />
                     <Link href={href} className="flex-1 font-medium text-ink hover:underline">
@@ -292,13 +292,13 @@ export function AccountClient() {
 
         {tab === "alerts" && (
           <div className="space-y-5">
-            <div className="rounded-2xl border border-ink/5 bg-white p-6 shadow-soft">
+            <div className="rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft">
               <div className="grid gap-3 sm:grid-cols-[1fr_1fr_120px_auto] sm:items-end">
                 <Field label={locale === "tr" ? "Nereden" : "From"}>
                   <select
                     value={alertFrom}
                     onChange={(e) => setAlertFrom(e.target.value)}
-                    className="h-12 w-full rounded-xl border border-ink/10 bg-white px-3 text-[15px]"
+                    className="h-12 w-full rounded-xl border border-ink/10 bg-surface px-3 text-[15px]"
                   >
                     {AIRPORTS.map((a) => (
                       <option key={a.iata} value={a.iata}>
@@ -311,7 +311,7 @@ export function AccountClient() {
                   <select
                     value={alertTo}
                     onChange={(e) => setAlertTo(e.target.value)}
-                    className="h-12 w-full rounded-xl border border-ink/10 bg-white px-3 text-[15px]"
+                    className="h-12 w-full rounded-xl border border-ink/10 bg-surface px-3 text-[15px]"
                   >
                     {AIRPORTS.map((a) => (
                       <option key={a.iata} value={a.iata}>
@@ -342,7 +342,7 @@ export function AccountClient() {
                 {alerts.map((a) => (
                   <div
                     key={a.id}
-                    className="flex items-center gap-4 rounded-2xl border border-ink/5 bg-white p-4 shadow-soft"
+                    className="flex items-center gap-4 rounded-2xl border border-ink/5 bg-surface p-4 shadow-soft"
                   >
                     <Bell className="h-4.5 w-4.5 shrink-0 text-gold-deep" />
                     <p className="flex-1 text-sm font-medium text-ink">
@@ -367,7 +367,7 @@ export function AccountClient() {
         )}
 
         {tab === "profile" && (
-          <div className="max-w-md rounded-2xl border border-ink/5 bg-white p-6 shadow-soft">
+          <div className="max-w-md rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft">
             <div className="space-y-4">
               <Field label={t("profileName")}>
                 <Input value={fullName} onChange={(e) => setFullName(e.target.value)} />

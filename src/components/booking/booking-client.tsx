@@ -289,7 +289,7 @@ export function BookingClient() {
                 {paxTypes.map((type, i) => (
                   <section
                     key={i}
-                    className="rounded-2xl border border-ink/5 bg-white p-6 shadow-soft"
+                    className="rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft"
                   >
                     <h2 className="mb-4 flex items-center gap-2 font-semibold text-ink">
                       {t("passengerTitle", { index: i + 1 })}
@@ -313,7 +313,7 @@ export function BookingClient() {
                       <Field label={t("gender")}>
                         <select
                           {...register(`passengers.${i}.gender`)}
-                          className="h-12 w-full rounded-xl border border-ink/10 bg-white px-3 text-[15px] text-ink focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/20"
+                          className="h-12 w-full rounded-xl border border-ink/10 bg-surface px-3 text-[15px] text-ink focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/20"
                         >
                           <option value="m">{t("male")}</option>
                           <option value="f">{t("female")}</option>
@@ -322,7 +322,7 @@ export function BookingClient() {
                       <Field label={t("documentType")}>
                         <select
                           {...register(`passengers.${i}.documentType`)}
-                          className="h-12 w-full rounded-xl border border-ink/10 bg-white px-3 text-[15px] text-ink focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/20"
+                          className="h-12 w-full rounded-xl border border-ink/10 bg-surface px-3 text-[15px] text-ink focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/20"
                         >
                           <option value="id">{t("nationalId")}</option>
                           <option value="passport">{t("passport")}</option>
@@ -342,7 +342,7 @@ export function BookingClient() {
                   </section>
                 ))}
 
-                <section className="rounded-2xl border border-ink/5 bg-white p-6 shadow-soft">
+                <section className="rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft">
                   <h2 className="font-semibold text-ink">{t("contactTitle")}</h2>
                   <p className="mb-4 mt-1 text-[13px] text-ink-faint">{t("contactText")}</p>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -385,7 +385,7 @@ export function BookingClient() {
                 transition={{ duration: 0.3 }}
                 className="space-y-6"
               >
-                <section className="rounded-2xl border border-ink/5 bg-white p-6 shadow-soft">
+                <section className="rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft">
                   <h2 className="mb-4 font-semibold text-ink">{t("reviewTitle")}</h2>
                   {offer.itineraries.map((it, ii) => {
                     const f = it.segments[0];
@@ -418,10 +418,10 @@ export function BookingClient() {
                     {t("extras")}
                   </h2>
                   <div className="mt-3 flex flex-wrap gap-3">
-                    <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[13px] text-ink-faint shadow-soft">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-surface px-4 py-2 text-[13px] text-ink-faint shadow-soft">
                       <Luggage className="h-4 w-4" /> {t("extraBaggage")}
                     </span>
-                    <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[13px] text-ink-faint shadow-soft">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-surface px-4 py-2 text-[13px] text-ink-faint shadow-soft">
                       <Armchair className="h-4 w-4" /> {t("seatSelection")}
                     </span>
                   </div>
@@ -463,7 +463,7 @@ export function BookingClient() {
                   </span>
                 </div>
 
-                <section className="rounded-2xl border border-ink/5 bg-white p-6 shadow-soft">
+                <section className="rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft">
                   <h2 className="mb-4 flex items-center gap-2 font-semibold text-ink">
                     <CreditCard className="h-4.5 w-4.5 text-gold-deep" />
                     {t("paymentTitle")}
@@ -513,7 +513,7 @@ export function BookingClient() {
 
         {/* Fare summary */}
         <aside>
-          <div className="sticky top-24 rounded-2xl border border-ink/5 bg-white p-6 shadow-soft">
+          <div className="sticky top-24 rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft">
             <h2 className="font-semibold text-ink">{t("fareSummary")}</h2>
             <div className="mt-4 space-y-2.5 text-sm">
               <div className="flex justify-between text-ink-soft">

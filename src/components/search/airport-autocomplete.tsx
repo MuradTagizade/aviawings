@@ -46,7 +46,7 @@ export function AirportAutocomplete({
       </label>
       <div
         className={cn(
-          "flex h-14 cursor-text items-center gap-3 rounded-xl border bg-white px-4 transition-colors",
+          "flex h-14 cursor-text items-center gap-3 rounded-xl border bg-surface px-4 transition-colors",
           open ? "border-gold ring-2 ring-gold/20" : "border-ink/10 hover:border-ink/25"
         )}
         onClick={() => {
@@ -103,7 +103,7 @@ export function AirportAutocomplete({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.16 }}
-            className="absolute z-50 mt-2 max-h-80 w-full min-w-72 overflow-auto rounded-2xl border border-ink/8 bg-white py-2 shadow-lift"
+            className="absolute z-50 mt-2 max-h-80 w-full min-w-72 overflow-auto rounded-2xl border border-ink/8 bg-surface py-2 shadow-lift"
             role="listbox"
           >
             {results.map((a, i) => (

@@ -39,7 +39,7 @@ export function Inspiration() {
                 sizes="320px"
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6">
                 <p className="text-xs font-medium uppercase tracking-widest text-gold">
                   {d.country[locale]}

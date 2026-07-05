@@ -79,7 +79,7 @@ export function PopularRoutes() {
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/75 via-ink/15 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
                   <div>
                     <p className="flex items-center gap-2 font-display text-xl text-white">

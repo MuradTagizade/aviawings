@@ -96,7 +96,7 @@ export function CookieBanner() {
           role="dialog"
           aria-label={t("title")}
         >
-          <div className="overflow-hidden rounded-2xl border border-ink/8 bg-white shadow-lift">
+          <div className="overflow-hidden rounded-2xl border border-ink/8 bg-surface shadow-lift">
             <div className="p-5 sm:p-6">
               <div className="mb-3 flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2.5">

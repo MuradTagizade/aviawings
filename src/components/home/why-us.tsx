@@ -26,7 +26,7 @@ export function WhyUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="group rounded-2xl border border-ink/5 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
+            className="group rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
           >
             <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gold-soft transition-colors duration-300 group-hover:bg-gold">
               <Icon className="h-5 w-5 text-gold-deep transition-colors duration-300 group-hover:text-white" />

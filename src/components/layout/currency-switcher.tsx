@@ -35,7 +35,7 @@ export function CurrencySwitcher() {
             exit={{ opacity: 0, y: -4, scale: 0.97 }}
             transition={{ duration: 0.15 }}
             role="listbox"
-            className="absolute right-0 top-11 z-50 w-28 overflow-hidden rounded-xl border border-ink/8 bg-white py-1 shadow-lift"
+            className="absolute right-0 top-11 z-50 w-28 overflow-hidden rounded-xl border border-ink/8 bg-surface py-1 shadow-lift"
           >
             {CURRENCIES.map((c) => (
               <li key={c}>

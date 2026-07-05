@@ -12,7 +12,7 @@ export function PlannerBanner() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
       <FadeIn>
-        <div className="relative overflow-hidden rounded-3xl bg-ink px-6 py-14 text-center sm:px-12 sm:py-20">
+        <div className="relative overflow-hidden rounded-3xl bg-[#16162a] px-6 py-14 text-center sm:px-12 sm:py-20">
           {/* Ambient glow */}
           <div
             aria-hidden
@@ -48,10 +48,10 @@ export function PlannerBanner() {
             <Sparkles className="h-6 w-6 text-gold" />
           </motion.span>
 
-          <h2 className="mx-auto max-w-xl font-display text-3xl text-cream sm:text-4xl">
+          <h2 className="mx-auto max-w-xl font-display text-3xl text-[#f2efe9] sm:text-4xl">
             {t("plannerBannerTitle")}
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-cream/70">
+          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-white/65">
             {t("plannerBannerText")}
           </p>
           <Link

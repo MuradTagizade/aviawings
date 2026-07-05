@@ -86,7 +86,7 @@ export function PaxSelector({
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "flex h-14 w-full items-center gap-2.5 rounded-xl border bg-white px-3.5 text-left transition-colors",
+          "flex h-14 w-full items-center gap-2.5 rounded-xl border bg-surface px-3.5 text-left transition-colors",
           open ? "border-gold ring-2 ring-gold/20" : "border-ink/10 hover:border-ink/25"
         )}
       >
@@ -104,7 +104,7 @@ export function PaxSelector({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.16 }}
-            className="absolute right-0 z-50 mt-2 w-80 rounded-2xl border border-ink/8 bg-white p-5 shadow-lift"
+            className="absolute right-0 z-50 mt-2 w-80 rounded-2xl border border-ink/8 bg-surface p-5 shadow-lift"
           >
             <Counter
               label={t("adults")}

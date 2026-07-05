@@ -127,7 +127,7 @@ export function AuthClient({ mode }: { mode: Mode }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="rounded-3xl border border-ink/5 bg-white p-8 shadow-card"
+        className="rounded-3xl border border-ink/5 bg-surface p-8 shadow-card"
       >
         <h1 className="font-display text-3xl text-ink">{title}</h1>
         <p className="mt-2 text-sm text-ink-soft">{subtitle}</p>
@@ -137,7 +137,7 @@ export function AuthClient({ mode }: { mode: Mode }) {
             <button
               onClick={withGoogle}
               disabled={busy}
-              className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-full border border-ink/10 bg-white text-sm font-medium text-ink transition-all hover:border-ink/30 hover:shadow-soft"
+              className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-full border border-ink/10 bg-surface text-sm font-medium text-ink transition-all hover:border-ink/30 hover:shadow-soft"
             >
               <GoogleIcon />
               {t("signInWithGoogle")}

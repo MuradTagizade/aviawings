@@ -101,7 +101,7 @@ export function SearchWidget({
       className={cn(
         // z-20: backdrop-blur creates a stacking context, so the widget itself
         // must sit above later sections or its popovers get painted underneath
-        "relative z-20 rounded-2xl border border-ink/5 bg-white/95 shadow-lift backdrop-blur-sm",
+        "relative z-20 rounded-2xl border border-ink/5 bg-surface/95 shadow-lift backdrop-blur-sm",
         compact ? "p-4" : "p-5 sm:p-7"
       )}
     >
@@ -114,7 +114,7 @@ export function SearchWidget({
             onClick={() => setTripType(tt)}
             className={cn(
               "rounded-full px-4 py-1.5 text-[13px] font-medium transition-all",
-              tripType === tt ? "bg-white text-ink shadow-soft" : "text-ink-soft"
+              tripType === tt ? "bg-surface text-ink shadow-soft" : "text-ink-soft"
             )}
           >
             {tt === "round" ? t("roundTrip") : t("oneWay")}
@@ -135,7 +135,7 @@ export function SearchWidget({
           type="button"
           onClick={swap}
           aria-label={t("swap")}
-          className="mx-auto mb-2 hidden h-10 w-10 items-center justify-center rounded-full border border-ink/10 bg-white text-ink-soft transition-all hover:rotate-180 hover:border-gold hover:text-gold-deep lg:flex"
+          className="mx-auto mb-2 hidden h-10 w-10 items-center justify-center rounded-full border border-ink/10 bg-surface text-ink-soft transition-all hover:rotate-180 hover:border-gold hover:text-gold-deep lg:flex"
           style={{ transitionDuration: "400ms" }}
         >
           <ArrowLeftRight className="h-4 w-4" />

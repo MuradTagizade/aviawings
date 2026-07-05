@@ -92,17 +92,17 @@ export function WeatherPanel({ destination }: { destination: Destination }) {
           {t("typical", { month: monthFmt.format(departDate) })}
         </p>
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-xl bg-white p-4 text-center shadow-soft">
+          <div className="rounded-xl bg-surface p-4 text-center shadow-soft">
             <Thermometer className="mx-auto h-5 w-5 text-coral" />
             <p className="mt-2 font-display text-2xl text-ink">{high}°</p>
             <p className="text-xs text-ink-faint">{t("high")}</p>
           </div>
-          <div className="rounded-xl bg-white p-4 text-center shadow-soft">
+          <div className="rounded-xl bg-surface p-4 text-center shadow-soft">
             <Thermometer className="mx-auto h-5 w-5 text-sky" />
             <p className="mt-2 font-display text-2xl text-ink">{low}°</p>
             <p className="text-xs text-ink-faint">{t("low")}</p>
           </div>
-          <div className="rounded-xl bg-white p-4 text-center shadow-soft">
+          <div className="rounded-xl bg-surface p-4 text-center shadow-soft">
             <Droplets className="mx-auto h-5 w-5 text-sky" />
             <p className="mt-2 font-display text-2xl text-ink">{rainDays}</p>
             <p className="text-xs text-ink-faint">
@@ -134,7 +134,7 @@ export function WeatherPanel({ destination }: { destination: Destination }) {
             return (
               <div
                 key={d.date}
-                className="w-24 shrink-0 rounded-xl bg-white p-3.5 text-center shadow-soft"
+                className="w-24 shrink-0 rounded-xl bg-surface p-3.5 text-center shadow-soft"
               >
                 <p className="text-[11px] font-medium capitalize text-ink-faint">
                   {dayFmt.format(new Date(`${d.date}T00:00:00`))}

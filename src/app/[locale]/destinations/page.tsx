@@ -47,7 +47,7 @@ export default async function DestinationsPage({
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/15 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6">
                 <p className="text-xs font-medium uppercase tracking-widest text-gold">
                   {d.country[loc]}

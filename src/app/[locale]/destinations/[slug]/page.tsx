@@ -81,7 +81,7 @@ export default async function DestinationPage({
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-ink/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
         <div className="absolute inset-x-0 bottom-0">
           <div className="mx-auto flex max-w-7xl items-end justify-between px-4 pb-10 sm:px-6 lg:px-8">
             <div>
@@ -108,7 +108,7 @@ export default async function DestinationPage({
               { icon: Clock4, label: t("timezone"), value: d.timezone },
               { icon: Languages, label: t("language"), value: d.language[loc] },
             ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="bg-white p-5">
+              <div key={label} className="bg-surface p-5">
                 <Icon className="h-4.5 w-4.5 text-gold-deep" />
                 <p className="mt-2 text-[11px] font-medium uppercase tracking-wider text-ink-faint">
                   {label}
@@ -142,7 +142,7 @@ export default async function DestinationPage({
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {d.places.map((p, i) => (
               <FadeIn key={p.mapQuery} delay={(i % 3) * 0.06}>
-                <div className="group flex h-full flex-col rounded-2xl border border-ink/5 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card">
+                <div className="group flex h-full flex-col rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card">
                   <div className="mb-3 flex items-center justify-between">
                     <span
                       className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${CATEGORY_COLORS[p.category]}`}
@@ -199,7 +199,7 @@ export default async function DestinationPage({
           <div className="mt-6 space-y-3">
             {d.events.map((e, i) => (
               <FadeIn key={e.name.en} delay={i * 0.06}>
-                <div className="flex items-start gap-5 rounded-2xl border border-ink/5 bg-white p-5 shadow-soft">
+                <div className="flex items-start gap-5 rounded-2xl border border-ink/5 bg-surface p-5 shadow-soft">
                   <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-gold-soft text-center">
                     <span className="px-1 text-[10px] font-bold uppercase leading-tight tracking-wide text-gold-deep">
                       {e.when[loc]}
@@ -231,7 +231,7 @@ export default async function DestinationPage({
             ].map(({ icon: Icon, label, value }, i) => (
               <FadeIn key={label} delay={(i % 2) * 0.06}>
                 <div className="flex h-full items-start gap-4 rounded-2xl bg-sand/60 p-5">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-soft">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface shadow-soft">
                     <Icon className="h-4.5 w-4.5 text-gold-deep" />
                   </span>
                   <div>
@@ -246,8 +246,8 @@ export default async function DestinationPage({
 
         {/* ——— CTAs ——— */}
         <FadeIn className="mt-16">
-          <div className="flex flex-col items-center gap-4 rounded-3xl bg-ink px-6 py-12 text-center">
-            <h2 className="max-w-md font-display text-2xl text-cream sm:text-3xl">
+          <div className="flex flex-col items-center gap-4 rounded-3xl bg-[#16162a] px-6 py-12 text-center">
+            <h2 className="max-w-md font-display text-2xl text-[#f2efe9] sm:text-3xl">
               {t("flightsTo", { city: d.city[loc] })}
             </h2>
             <div className="mt-2 flex flex-wrap justify-center gap-3">
@@ -259,7 +259,7 @@ export default async function DestinationPage({
               </Link>
               <Link
                 href={`/planner?destination=${d.slug}`}
-                className="inline-flex h-12 items-center gap-2 rounded-full border border-cream/25 px-7 text-[15px] font-medium text-cream transition-all hover:border-gold hover:text-gold"
+                className="inline-flex h-12 items-center gap-2 rounded-full border border-white/25 px-7 text-[15px] font-medium text-[#f2efe9] transition-all hover:border-gold hover:text-gold"
               >
                 <Sparkles className="h-4 w-4" />
                 {t("planWithAi")}

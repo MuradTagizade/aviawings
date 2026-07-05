@@ -30,8 +30,14 @@ export const viewport: Viewport = {
   initialScale: 1,
   // Edge-to-edge on notched phones; components pad with safe-area insets
   viewportFit: "cover",
-  themeColor: "#faf8f5",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#faf8f5" },
+    { media: "(prefers-color-scheme: dark)", color: "#121220" },
+  ],
 };
+
+/** Applies the saved (or system) theme before first paint to avoid a flash. */
+const themeInitScript = `try{var t=localStorage.getItem("aw-theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`;
 
 export async function generateMetadata({
   params,
@@ -74,8 +80,13 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} className={`${fraunces.variable} ${inter.variable}`}>
+    <html
+      lang={locale}
+      className={`${fraunces.variable} ${inter.variable}`}
+      suppressHydrationWarning
+    >
       <body className="flex min-h-screen flex-col">
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <NextIntlClientProvider>
           <Providers>
             <Header />

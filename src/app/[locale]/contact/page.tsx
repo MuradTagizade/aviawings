@@ -44,7 +44,7 @@ export default async function ContactPage({
       <div className="mt-12 grid gap-4 sm:grid-cols-3">
         {c.cards.map(({ icon: Icon, title, text, href }, i) => (
           <FadeIn key={title} delay={i * 0.08}>
-            <div className="h-full rounded-2xl border border-ink/5 bg-white p-6 shadow-soft">
+            <div className="h-full rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft">
               <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gold-soft">
                 <Icon className="h-5 w-5 text-gold-deep" />
               </span>

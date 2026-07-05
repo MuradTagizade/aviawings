@@ -5,6 +5,7 @@
   --color-cream: #faf8f5;
   --color-sand: #f3efe7;
   --color-shell: #ece6da;
+  --color-surface: #ffffff;
   --color-ink: #1a1a2e;
   --color-ink-soft: #50536b;
   --color-ink-faint: #8b8ea3;
@@ -39,6 +40,37 @@
 html {
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
+  color-scheme: light;
+}
+
+/* — Dark theme: same tokens, night values. Toggled via .dark on <html>. — */
+.dark {
+  color-scheme: dark;
+  --color-cream: #121220; /* page background */
+  --color-sand: #1a1a2c; /* alt sections */
+  --color-shell: #262639;
+  --color-surface: #1c1c2f; /* cards, panels, popovers */
+  --color-ink: #edeaf2; /* text flips light */
+  --color-ink-soft: #a9a7bb;
+  --color-ink-faint: #75738a;
+  --color-gold: #c9a96e;
+  --color-gold-deep: #ddc18b; /* brighter for contrast on dark */
+  --color-gold-soft: #2b2519;
+  --color-sky: #8fb6e0;
+  --color-sky-soft: #1a2334;
+  --color-leaf: #7ac8a0;
+  --color-leaf-soft: #17281f;
+  --color-coral: #e8877f;
+  --color-coral-soft: #321f1d;
+
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.35), 0 16px 40px rgb(0 0 0 / 0.5);
+  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.3), 0 12px 32px rgb(0 0 0 / 0.4);
+}
+
+.dark ::selection {
+  background: #3a3223;
+  color: #edeaf2;
 }
 
 body {

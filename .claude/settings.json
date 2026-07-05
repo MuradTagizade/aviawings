@@ -28,7 +28,14 @@
       "Bash(pkill -f \"cloudflared tunnel\")",
       "Bash(pkill -f \"next start -p 3002\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" --max-time 10 https://numbers-consolidated-struct-trademarks.trycloudflare.com/tr)",
-      "Bash(git commit -q -m 'Fix search widget popovers rendering behind route cards *)"
+      "Bash(git commit -q -m 'Fix search widget popovers rendering behind route cards *)",
+      "Bash(awk -F: '{print $1\" \"$3}')",
+      "Bash(awk -F: '{print $1}')",
+      "Bash(perl -pi -e 's/rounded-3xl bg-ink px-6/rounded-3xl bg-[#16162a] px-6/; s/text-cream sm:text-4xl/text-[#f2efe9] sm:text-4xl/; s/text-cream\\\\/70/text-white\\\\/65/' src/components/home/planner-banner.tsx)",
+      "Bash(perl -pi -e 's/rounded-3xl bg-ink px-6/rounded-3xl bg-[#16162a] px-6/; s/font-display text-2xl text-cream sm:text-3xl/font-display text-2xl text-[#f2efe9] sm:text-3xl/; s/border-cream\\\\/25 px-7 text-\\\\[15px\\\\] font-medium text-cream/border-white\\\\/25 px-7 text-[15px] font-medium text-[#f2efe9]/' \"src/app/[locale]/destinations/[slug]/page.tsx\")",
+      "Bash(perl -pi -e 's/bg-gradient-to-br from-ink to-sky text-cream/bg-gradient-to-br from-[#1a1a2e] to-[#35639b] text-white/' src/components/planner/planner-client.tsx)",
+      "Bash(curl -s http://localhost:3130/tr)",
+      "Bash(git commit -q -m 'Add elegant dark mode *)"
     ]
   }
 }

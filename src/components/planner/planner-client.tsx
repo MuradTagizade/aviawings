@@ -282,7 +282,7 @@ export function PlannerClient() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.5, delay: Math.min(di * 0.08, 0.3) }}
-              className="overflow-hidden rounded-2xl border border-ink/5 bg-white shadow-soft"
+              className="overflow-hidden rounded-2xl border border-ink/5 bg-surface shadow-soft"
             >
               <div className="flex items-center gap-4 border-b border-ink/5 bg-sand/50 px-6 py-4">
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-ink font-display text-lg text-cream">
@@ -362,7 +362,7 @@ export function PlannerClient() {
         </div>
 
         {/* ——— Chat ——— */}
-        <div className="mt-14 rounded-2xl border border-ink/5 bg-white shadow-soft">
+        <div className="mt-14 rounded-2xl border border-ink/5 bg-surface shadow-soft">
           <div className="border-b border-ink/5 px-6 py-4">
             <h2 className="flex items-center gap-2 font-semibold text-ink">
               <Sparkles className="h-4 w-4 text-gold-deep" />
@@ -497,7 +497,7 @@ export function PlannerClient() {
                       sizes="200px"
                       className="object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                     <span className="absolute bottom-3 left-3 font-display text-lg text-white">
                       {d.city[locale]}
                     </span>
@@ -506,7 +506,7 @@ export function PlannerClient() {
                 <button
                   onClick={() => setAnswers((a) => ({ ...a, destination: "surprise" }))}
                   className={cn(
-                    "flex h-32 flex-col items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-ink to-sky text-cream transition-all",
+                    "flex h-32 flex-col items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-[#1a1a2e] to-[#35639b] text-white transition-all",
                     answers.destination === "surprise"
                       ? "ring-3 ring-gold ring-offset-2 ring-offset-cream"
                       : "hover:scale-[1.02]"
@@ -535,7 +535,7 @@ export function PlannerClient() {
                     key={key}
                     onClick={() => setAnswers((a) => ({ ...a, style: key }))}
                     className={cn(
-                      "flex items-start gap-4 rounded-2xl border bg-white p-5 text-left transition-all",
+                      "flex items-start gap-4 rounded-2xl border bg-surface p-5 text-left transition-all",
                       answers.style === key
                         ? "border-gold bg-gold-soft/50 shadow-card"
                         : "border-ink/8 hover:border-ink/25 hover:shadow-soft"
@@ -570,7 +570,7 @@ export function PlannerClient() {
                     key={key}
                     onClick={() => setAnswers((a) => ({ ...a, pace: key }))}
                     className={cn(
-                      "rounded-2xl border bg-white p-6 text-center transition-all",
+                      "rounded-2xl border bg-surface p-6 text-center transition-all",
                       answers.pace === key
                         ? "border-gold bg-gold-soft/50 shadow-card"
                         : "border-ink/8 hover:border-ink/25 hover:shadow-soft"
@@ -602,7 +602,7 @@ export function PlannerClient() {
                     key={key}
                     onClick={() => setAnswers((a) => ({ ...a, company: key }))}
                     className={cn(
-                      "rounded-2xl border bg-white p-6 text-center font-semibold text-ink transition-all",
+                      "rounded-2xl border bg-surface p-6 text-center font-semibold text-ink transition-all",
                       answers.company === key
                         ? "border-gold bg-gold-soft/50 shadow-card"
                         : "border-ink/8 hover:border-ink/25 hover:shadow-soft"
@@ -631,7 +631,7 @@ export function PlannerClient() {
                     key={key}
                     onClick={() => setAnswers((a) => ({ ...a, budget: key }))}
                     className={cn(
-                      "rounded-2xl border bg-white p-6 text-center transition-all",
+                      "rounded-2xl border bg-surface p-6 text-center transition-all",
                       answers.budget === key
                         ? "border-gold bg-gold-soft/50 shadow-card"
                         : "border-ink/8 hover:border-ink/25 hover:shadow-soft"

@@ -363,7 +363,7 @@ export function ResultsClient() {
                 "shrink-0 rounded-full border px-4 py-2 text-[13px] font-medium transition-all",
                 active
                   ? "border-ink bg-ink text-cream"
-                  : "border-ink/10 bg-white text-ink-soft hover:border-ink/30"
+                  : "border-ink/10 bg-surface text-ink-soft hover:border-ink/30"
               )}
             >
               {dayFmt.format(d)}
@@ -393,7 +393,7 @@ export function ResultsClient() {
                 onClick={() => setSort(k)}
                 className={cn(
                   "rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all",
-                  sort === k ? "bg-white text-ink shadow-soft" : "text-ink-soft"
+                  sort === k ? "bg-surface text-ink shadow-soft" : "text-ink-soft"
                 )}
               >
                 {t(`sort.${k}`)}
@@ -402,7 +402,7 @@ export function ResultsClient() {
           </div>
           <button
             onClick={() => setMobileFiltersOpen(true)}
-            className="flex h-9 items-center gap-1.5 rounded-full border border-ink/10 bg-white px-4 text-[13px] font-medium text-ink-soft lg:hidden"
+            className="flex h-9 items-center gap-1.5 rounded-full border border-ink/10 bg-surface px-4 text-[13px] font-medium text-ink-soft lg:hidden"
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
             {tf("title")}
@@ -419,7 +419,7 @@ export function ResultsClient() {
 
       <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
         <aside className="hidden lg:block">
-          <div className="sticky top-24 rounded-2xl border border-ink/5 bg-white p-5 shadow-soft">
+          <div className="sticky top-24 rounded-2xl border border-ink/5 bg-surface p-5 shadow-soft">
             {filterPanel}
           </div>
         </aside>
@@ -427,7 +427,7 @@ export function ResultsClient() {
         <div className="space-y-3.5">
           {query.isLoading &&
             Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="rounded-2xl border border-ink/5 bg-white p-5 shadow-soft">
+              <div key={i} className="rounded-2xl border border-ink/5 bg-surface p-5 shadow-soft">
                 <div className="flex items-center gap-4">
                   <div className="skeleton h-10 w-10 rounded-full" />
                   <div className="flex-1 space-y-2.5">
@@ -452,7 +452,7 @@ export function ResultsClient() {
           )}
 
           {!query.isLoading && !query.isError && filtered.length === 0 && (
-            <div className="rounded-2xl border border-ink/5 bg-white p-10 text-center shadow-soft">
+            <div className="rounded-2xl border border-ink/5 bg-surface p-10 text-center shadow-soft">
               <p className="font-display text-xl text-ink">{t("noResults")}</p>
               <p className="mt-1 text-sm text-ink-soft">{t("noResultsSub")}</p>
             </div>
@@ -467,7 +467,7 @@ export function ResultsClient() {
               href={`/destinations/${destGuide.slug}?depart=${search.departDate}${search.returnDate ? `&return=${search.returnDate}` : ""}`}
               className="group flex items-center gap-3 rounded-2xl border border-gold/30 bg-gold-soft/40 p-5 transition-all hover:shadow-card"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-soft">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface shadow-soft">
                 <Compass className="h-5 w-5 text-gold-deep" />
               </span>
               <span className="text-sm font-medium text-ink group-hover:underline">
@@ -494,7 +494,7 @@ export function ResultsClient() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 320, damping: 32 }}
-              className="safe-bottom fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-auto rounded-t-3xl bg-white p-6 pb-10 lg:hidden"
+              className="safe-bottom fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-auto rounded-t-3xl bg-surface p-6 pb-10 lg:hidden"
             >
               <div className="mb-5 flex items-center justify-between">
                 <h2 className="font-display text-xl text-ink">{tf("title")}</h2>
