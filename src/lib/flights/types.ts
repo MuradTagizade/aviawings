@@ -39,7 +39,8 @@ export interface FlightOffer {
   itineraries: FlightItinerary[]; // [outbound] or [outbound, return]
   price: {
     total: number;
-    currency: "USD" | "EUR" | "TRY" | "AZN";
+    /** ISO currency code as quoted by the provider (e.g. USD, GBP) */
+    currency: string;
   };
   cabin: "economy" | "business";
   seatsLeft?: number;

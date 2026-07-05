@@ -10,7 +10,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import type { FlightOffer, FlightSearchParams, FlightSearchResult } from "@/lib/flights/types";
 import { findAirport } from "@/lib/airports";
 import { findDestinationByIata } from "@/content/destinations";
-import { convert, formatMoney, type Currency } from "@/lib/currency";
+import { convert, formatMoney } from "@/lib/currency";
 import { usePreferences } from "@/stores/preferences";
 import { useBooking } from "@/stores/booking";
 import { trackEvent } from "@/lib/analytics";
@@ -117,7 +117,7 @@ export function ResultsClient() {
   const priceBounds = useMemo(() => {
     if (offers.length === 0) return null;
     const prices = offers.map((o) =>
-      convert(o.price.total, o.price.currency as Currency, currency)
+      convert(o.price.total, o.price.currency, currency)
     );
     return { min: Math.floor(Math.min(...prices)), max: Math.ceil(Math.max(...prices)) };
   }, [offers, currency]);
@@ -139,7 +139,7 @@ export function ResultsClient() {
         if (![...filters.times].some((b) => inTimeBucket(h, b))) return false;
       }
       if (filters.maxPrice !== null) {
-        const p = convert(o.price.total, o.price.currency as Currency, currency);
+        const p = convert(o.price.total, o.price.currency, currency);
         if (p > filters.maxPrice) return false;
       }
       return true;

@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Briefcase, ChevronDown, Luggage, RotateCcw } from "lucide-react";
 import type { FlightItinerary, FlightOffer } from "@/lib/flights/types";
 import { findAirport } from "@/lib/airports";
-import { convert, formatMoney, type Currency } from "@/lib/currency";
+import { convert, formatMoney } from "@/lib/currency";
 import { usePreferences } from "@/stores/preferences";
 import { cn, formatDuration } from "@/lib/utils";
 
@@ -125,7 +125,7 @@ export function FlightCard({
   const { currency } = usePreferences();
   const [expanded, setExpanded] = useState(false);
 
-  const price = convert(offer.price.total, offer.price.currency as Currency, currency);
+  const price = convert(offer.price.total, offer.price.currency, currency);
 
   return (
     <motion.article

@@ -17,7 +17,7 @@ import {
 import { Link, useRouter } from "@/i18n/navigation";
 import { useBooking } from "@/stores/booking";
 import { usePreferences } from "@/stores/preferences";
-import { convert, formatMoney, type Currency } from "@/lib/currency";
+import { convert, formatMoney } from "@/lib/currency";
 import { findAirport } from "@/lib/airports";
 import { findDestinationByIata } from "@/content/destinations";
 import { trackEvent } from "@/lib/analytics";
@@ -111,7 +111,7 @@ export function BookingClient() {
     );
   }
 
-  const price = convert(offer.price.total, offer.price.currency as Currency, currency);
+  const price = convert(offer.price.total, offer.price.currency, currency);
   const fromCity = findAirport(search.origin)?.city[locale] ?? search.origin;
   const toCity = findAirport(search.destination)?.city[locale] ?? search.destination;
 
