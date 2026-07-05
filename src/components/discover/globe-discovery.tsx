@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import createGlobe from "cobe";
+import type MapLibreGL from "maplibre-gl";
 import { useLocale, useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
 import { ExternalLink, Globe2, MapPin, Sparkles, Wand2 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { Map, MapControls, MapMarker } from "@/components/ui/map";
 import { HIDDEN_GEMS, type HiddenGem } from "@/content/hidden-gems";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -18,27 +19,19 @@ interface WikiInfo {
   url?: string;
 }
 
-/** cobe example formula: geographic coords → globe rotation angles */
-function locationToAngles(lat: number, lon: number): [number, number] {
-  return [Math.PI - ((lon * Math.PI) / 180 - Math.PI / 2), (lat * Math.PI) / 180];
-}
-
 export function GlobeDiscovery() {
   const t = useTranslations("discover");
   const locale = useLocale() as "tr" | "en";
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  // Rotation state lives in refs so onRender (60fps) avoids React re-renders
-  const focusRef = useRef<[number, number] | null>(null);
-  const currentRef = useRef<[number, number]>([0.3, 0.3]);
-  const autoSpinRef = useRef(true);
-  const markerRef = useRef<{ location: [number, number]; size: number }[]>([]);
+  const mapRef = useRef<MapLibreGL.Map | null>(null);
+  const idleSpinRef = useRef(true);
+  const aiAbortRef = useRef<AbortController | null>(null);
+  const lastIndexRef = useRef<number>(-1);
 
   const [gem, setGem] = useState<HiddenGem | null>(null);
   const [wiki, setWiki] = useState<WikiInfo | null>(null);
   const [aiNote, setAiNote] = useState<string | null>(null);
   const [phase, setPhase] = useState<"idle" | "spinning" | "revealed">("idle");
-  const lastIndexRef = useRef<number>(-1);
 
   const countryName = useMemo(() => {
     if (!gem) return "";
@@ -53,72 +46,25 @@ export function GlobeDiscovery() {
     }
   }, [gem, locale]);
 
-  /* ——— Globe ——— */
+  /* Gentle idle rotation until the user interacts or spins */
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    let width = canvas.offsetWidth;
-
-    const globe = createGlobe(canvas, {
-      devicePixelRatio: 2,
-      width: width * 2,
-      height: width * 2,
-      phi: currentRef.current[0],
-      theta: currentRef.current[1],
-      dark: 1,
-      diffuse: 1.2,
-      mapSamples: 18000,
-      mapBrightness: 5.5,
-      baseColor: [0.16, 0.16, 0.24],
-      markerColor: [0.79, 0.66, 0.43],
-      glowColor: [0.82, 0.75, 0.6],
-      markers: [],
-    });
-
-    // cobe v2 has no onRender — drive the rotation with our own rAF loop
-    let raf = 0;
-    const tick = () => {
-      if (focusRef.current) {
-        // Ease toward the selected place
-        const [tp, tt] = focusRef.current;
-        const [cp, ct] = currentRef.current;
-        const np = cp + (tp - cp) * 0.07;
-        const nt = ct + (tt - ct) * 0.07;
-        currentRef.current = [np, nt];
-        if (Math.abs(tp - np) < 0.005 && Math.abs(tt - nt) < 0.005) {
-          focusRef.current = null;
-        }
-      } else if (autoSpinRef.current) {
-        currentRef.current = [currentRef.current[0] + 0.0025, currentRef.current[1]];
-      }
-      globe.update({
-        phi: currentRef.current[0],
-        theta: currentRef.current[1],
-        markers: markerRef.current,
-        width: width * 2,
-        height: width * 2,
-      });
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-
-    const onResize = () => {
-      width = canvas.offsetWidth;
-    };
-    window.addEventListener("resize", onResize);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", onResize);
-      globe.destroy();
-    };
+    const interval = setInterval(() => {
+      const map = mapRef.current;
+      if (!map || !idleSpinRef.current || map.isMoving()) return;
+      const c = map.getCenter();
+      map.jumpTo({ center: [c.lng + 0.25, c.lat] });
+    }, 60);
+    return () => clearInterval(interval);
   }, []);
 
   /* ——— Spin ——— */
   async function spin() {
     if (phase === "spinning") return;
+    const map = mapRef.current;
     setPhase("spinning");
     setWiki(null);
     setAiNote(null);
+    aiAbortRef.current?.abort();
 
     // pick a random gem, never the same twice in a row
     let idx = Math.floor(Math.random() * HIDDEN_GEMS.length);
@@ -128,13 +74,14 @@ export function GlobeDiscovery() {
     setGem(next);
     trackEvent("globe_spin", { place: next.name });
 
-    // dramatic spin: several extra revolutions before easing onto the target
-    autoSpinRef.current = false;
-    const [tp, tt] = locationToAngles(next.lat, next.lon);
-    focusRef.current = [tp + Math.PI * 6, tt];
-    // normalize so easing distance stays sane
-    currentRef.current = [currentRef.current[0] % (Math.PI * 2), currentRef.current[1]];
-    markerRef.current = [{ location: [next.lat, next.lon], size: 0.09 }];
+    idleSpinRef.current = false;
+    map?.flyTo({
+      center: [next.lon, next.lat],
+      zoom: 4.5,
+      duration: 2600,
+      curve: 1.6,
+      essential: true,
+    });
 
     // fetch wiki while the globe travels
     const wikiPromise = fetch(
@@ -145,15 +92,18 @@ export function GlobeDiscovery() {
 
     const [info] = await Promise.all([
       wikiPromise,
-      new Promise((r) => setTimeout(r, 2200)),
+      new Promise((r) => setTimeout(r, 2400)),
     ]);
     setWiki(info);
     setPhase("revealed");
 
-    // best-effort AI one-liner (skips silently when AI is unavailable)
+    // best-effort streaming AI teaser — aborted if the user spins again
+    const controller = new AbortController();
+    aiAbortRef.current = controller;
     fetch("/api/ai/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
       body: JSON.stringify({
         mode: "chat",
         locale,
@@ -175,13 +125,15 @@ export function GlobeDiscovery() {
         let acc = "";
         for (;;) {
           const { done, value } = await reader.read();
-          if (done) break;
+          if (done || controller.signal.aborted) break;
           acc += decoder.decode(value, { stream: true });
           setAiNote(acc);
         }
       })
       .catch(() => {});
   }
+
+  useEffect(() => () => aiAbortRef.current?.abort(), []);
 
   const displayName = wiki?.title ?? gem?.name ?? "";
 
@@ -302,21 +254,37 @@ export function GlobeDiscovery() {
           </AnimatePresence>
         </div>
 
-        {/* ——— Globe ——— */}
-        <div className="order-1 mx-auto w-full max-w-[420px] lg:order-2">
+        {/* ——— Interactive globe (MapLibre) ——— */}
+        <div className="order-1 mx-auto w-full max-w-[480px] lg:order-2">
           <div
             className={cn(
-              "relative aspect-square w-full transition-transform duration-300",
+              "relative aspect-square w-full overflow-hidden rounded-full border border-white/10 shadow-lift transition-transform duration-300",
               phase === "spinning" && "scale-[1.02]"
             )}
+            onPointerDown={() => {
+              idleSpinRef.current = false;
+            }}
           >
-            <canvas
-              ref={canvasRef}
-              className="h-full w-full cursor-grab"
-              style={{ contain: "layout paint size" }}
-              onClick={spin}
-              aria-label={t("spin")}
-            />
+            <Map
+              ref={mapRef}
+              projection={{ type: "globe" }}
+              center={[35, 25]}
+              zoom={1.1}
+              minZoom={0.8}
+              maxZoom={10}
+              scrollZoom={false}
+              attributionControl={false}
+            >
+              <MapControls className="right-[18%] top-[8%]" />
+              {gem && (
+                <MapMarker longitude={gem.lon} latitude={gem.lat} onClick={spin}>
+                  <span className="relative flex h-5 w-5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-60" />
+                    <span className="relative inline-flex h-5 w-5 rounded-full border-2 border-white bg-gold shadow-lg" />
+                  </span>
+                </MapMarker>
+              )}
+            </Map>
           </div>
         </div>
       </div>
