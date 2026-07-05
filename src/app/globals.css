@@ -1,26 +1,119 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* — Aviawings palette: light premium — */
+  --color-cream: #faf8f5;
+  --color-sand: #f3efe7;
+  --color-shell: #ece6da;
+  --color-ink: #1a1a2e;
+  --color-ink-soft: #50536b;
+  --color-ink-faint: #8b8ea3;
+  --color-gold: #c9a96e;
+  --color-gold-deep: #a9884b;
+  --color-gold-soft: #f0e6d2;
+  --color-sky: #35639b;
+  --color-sky-soft: #e8eff7;
+  --color-leaf: #2f7d5b;
+  --color-leaf-soft: #e5f2ec;
+  --color-coral: #c0453e;
+  --color-coral-soft: #f9e9e8;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+
+  --shadow-soft: 0 1px 2px rgb(26 26 46 / 0.04), 0 8px 24px rgb(26 26 46 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(26 26 46 / 0.05), 0 16px 40px rgb(26 26 46 / 0.1);
+  --shadow-card: 0 1px 3px rgb(26 26 46 / 0.05), 0 12px 32px rgb(26 26 46 / 0.07);
+
+  --animate-shimmer: shimmer 1.8s linear infinite;
+
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
   }
 }
 
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-gold-soft);
+  color: var(--color-ink);
+}
+
+/* Elegant focus ring */
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skeleton shimmer helper */
+.skeleton {
+  background: linear-gradient(
+    100deg,
+    var(--color-sand) 40%,
+    var(--color-shell) 50%,
+    var(--color-sand) 60%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
+
+/* Editorial prose for legal / guide text */
+.prose-avia h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  margin: 2rem 0 0.75rem;
+}
+.prose-avia h3 {
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+}
+.prose-avia p,
+.prose-avia li {
+  color: var(--color-ink-soft);
+  line-height: 1.75;
+  margin-bottom: 0.75rem;
+}
+.prose-avia ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+/* Hide scrollbar for horizontal carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
