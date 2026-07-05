@@ -16,7 +16,19 @@
       "Bash(curl -sI http://localhost:3129/tr)",
       "Bash(curl -s http://localhost:3129/tr)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3129/tr)",
-      "Bash(git commit -q -m 'Fix broken images, remove coming-soon teasers, PWA support, security hardening *)"
+      "Bash(git commit -q -m 'Fix broken images, remove coming-soon teasers, PWA support, security hardening *)",
+      "Bash(gh auth *)",
+      "Bash(curl -s -o /dev/null -w \"yerel sunucu: %{http_code}\\\\n\" http://localhost:3002/tr)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(curl -sL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-darwin-arm64.tgz -o /private/tmp/claude-501/-Users-manis85-Documents-aviaticket/4501609f-b3ad-4e30-8463-ccd1e84bc153/scratchpad/cf.tgz --max-time 60)",
+      "Bash(tar -xzf /private/tmp/claude-501/-Users-manis85-Documents-aviaticket/4501609f-b3ad-4e30-8463-ccd1e84bc153/scratchpad/cf.tgz -C /private/tmp/claude-501/-Users-manis85-Documents-aviaticket/4501609f-b3ad-4e30-8463-ccd1e84bc153/scratchpad)",
+      "Bash(chmod +x /private/tmp/claude-501/-Users-manis85-Documents-aviaticket/4501609f-b3ad-4e30-8463-ccd1e84bc153/scratchpad/cloudflared)",
+      "Bash(/private/tmp/claude-501/-Users-manis85-Documents-aviaticket/4501609f-b3ad-4e30-8463-ccd1e84bc153/scratchpad/cloudflared --version)",
+      "Bash(pkill -f \"cloudflared tunnel\")",
+      "Bash(pkill -f \"next start -p 3002\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" --max-time 10 https://numbers-consolidated-struct-trademarks.trycloudflare.com/tr)",
+      "Bash(git commit -q -m 'Fix search widget popovers rendering behind route cards *)"
     ]
   }
 }

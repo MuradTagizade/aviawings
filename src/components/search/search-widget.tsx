@@ -99,7 +99,9 @@ export function SearchWidget({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: compact ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
-        "rounded-2xl border border-ink/5 bg-white/95 shadow-lift backdrop-blur-sm",
+        // z-20: backdrop-blur creates a stacking context, so the widget itself
+        // must sit above later sections or its popovers get painted underneath
+        "relative z-20 rounded-2xl border border-ink/5 bg-white/95 shadow-lift backdrop-blur-sm",
         compact ? "p-4" : "p-5 sm:p-7"
       )}
     >
