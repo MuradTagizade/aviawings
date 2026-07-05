@@ -42,6 +42,11 @@ export function Footer() {
                   {tn("planner")}
                 </Link>
               </li>
+              <li>
+                <Link href="/visa" className="text-ink-soft transition-colors hover:text-ink">
+                  {tn("visa")}
+                </Link>
+              </li>
             </ul>
           </div>
 

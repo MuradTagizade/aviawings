@@ -224,23 +224,38 @@ export default async function DestinationPage({
           </FadeIn>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {[
-              { icon: StampIcon, label: t("practical.visa"), value: d.practical.visa[loc] },
+              {
+                icon: StampIcon,
+                label: t("practical.visa"),
+                value: d.practical.visa[loc],
+                href: `/visa?destination=${d.currencyCode === "AZN" ? "AZ" : "TR"}`,
+              },
               { icon: Plug, label: t("practical.plug"), value: d.practical.plug },
               { icon: TramFront, label: t("practical.transport"), value: d.practical.transport[loc] },
               { icon: Lightbulb, label: t("practical.tip"), value: d.practical.tip[loc] },
-            ].map(({ icon: Icon, label, value }, i) => (
-              <FadeIn key={label} delay={(i % 2) * 0.06}>
-                <div className="flex h-full items-start gap-4 rounded-2xl bg-sand/60 p-5">
+            ].map(({ icon: Icon, label, value, href }, i) => {
+              const card = (
+                <div className="flex h-full items-start gap-4 rounded-2xl bg-sand/60 p-5 transition-shadow duration-300 hover:shadow-soft">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface shadow-soft">
                     <Icon className="h-4.5 w-4.5 text-gold-deep" />
                   </span>
                   <div>
                     <p className="text-[13px] font-semibold text-ink">{label}</p>
                     <p className="mt-0.5 text-sm leading-relaxed text-ink-soft">{value}</p>
+                    {href && (
+                      <p className="mt-2 text-[13px] font-medium text-gold-deep underline underline-offset-4">
+                        {t("checkVisa")}
+                      </p>
+                    )}
                   </div>
                 </div>
-              </FadeIn>
-            ))}
+              );
+              return (
+                <FadeIn key={label} delay={(i % 2) * 0.06}>
+                  {href ? <Link href={href}>{card}</Link> : card}
+                </FadeIn>
+              );
+            })}
           </div>
         </div>
 

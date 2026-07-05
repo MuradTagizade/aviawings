@@ -33,7 +33,8 @@
     "account": "Hesabım",
     "signIn": "Giriş yap",
     "signOut": "Çıkış yap",
-    "menu": "Menü"
+    "menu": "Menü",
+    "visa": "Vize"
   },
   "footer": {
     "explore": "Keşfet",
@@ -246,7 +247,8 @@
       "tip": "İpucu"
     },
     "planWithAi": "Bu şehir için AI planı oluştur",
-    "searchFlights": "Uçuş ara"
+    "searchFlights": "Uçuş ara",
+    "checkVisa": "Vize durumunu sorgula"
   },
   "planner": {
     "title": "AI Seyahat Planlayıcı",
@@ -395,6 +397,40 @@
     "planner": {
       "title": "AI Seyahat Planlayıcı — Aviawings",
       "description": "Yapay zekâ destekli planlayıcı ile zevkinize göre kişisel bir gezi rotası oluşturun."
+    },
+    "visa": {
+      "title": "Vize Sorgula — Aviawings",
+      "description": "Pasaportunuza göre hangi ülkeye vize gerekiyor? Anında sorgulayın: vizesiz, e-vize, varışta vize."
     }
+  },
+  "visa": {
+    "title": "Vize Sorgula",
+    "subtitle": "Pasaportunuzu ve gideceğiniz ülkeyi seçin — vize gerekip gerekmediğini anında görün.",
+    "passport": "Pasaport ülkesi",
+    "destination": "Gidilecek ülke",
+    "selectCountry": "Ülke seçin",
+    "status": {
+      "visa_free": "Vize gerekmez",
+      "visa_free_days": "Vize gerekmez · {days} güne kadar",
+      "e_visa": "e-Vize gerekli",
+      "visa_on_arrival": "Varışta vize alınabilir",
+      "eta": "Elektronik seyahat izni (eTA) gerekli",
+      "visa_required": "Vize gerekli",
+      "no_admission": "Giriş kısıtlı",
+      "self": "Kendi ülkeniz — vize gerekmez"
+    },
+    "desc": {
+      "visa_free": "Bu pasaportla vizesiz seyahat edebilirsiniz. Pasaportunuzun dönüş tarihinden itibaren en az 6 ay geçerli olmasına dikkat edin.",
+      "e_visa": "Yolculuktan önce çevrim içi e-vize başvurusu yapmanız gerekir. Başvurular genellikle birkaç iş günü içinde sonuçlanır.",
+      "visa_on_arrival": "Vizenizi varışta sınır kapısında alabilirsiniz. Yanınızda fotoğraf ve ücret için nakit bulundurmanız önerilir.",
+      "eta": "Yolculuktan önce çevrim içi elektronik seyahat izni almanız gerekir; işlem genellikle dakikalar sürer.",
+      "visa_required": "Yolculuktan önce konsolosluk veya büyükelçilikten vize almanız gerekir. Başvuruyu erken yapmanızı öneririz.",
+      "no_admission": "Bu rota için giriş kısıtlaması görünüyor; ayrıntı için resmî makamlara danışın.",
+      "self": "Kendi vatandaşı olduğunuz ülkeye seyahat için vize gerekmez."
+    },
+    "checking": "Sorgulanıyor…",
+    "updated": "Veri güncellemesi: {date}",
+    "disclaimer": "Bu bilgiler açık veri kaynaklıdır ve değişiklik gösterebilir; seyahatten önce mutlaka resmî makamlardan doğrulayın.",
+    "source": "Kaynak: Passport Index açık veri seti"
   }
 }

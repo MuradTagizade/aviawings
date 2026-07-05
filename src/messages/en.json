@@ -33,7 +33,8 @@
     "account": "My account",
     "signIn": "Sign in",
     "signOut": "Sign out",
-    "menu": "Menu"
+    "menu": "Menu",
+    "visa": "Visa"
   },
   "footer": {
     "explore": "Explore",
@@ -246,7 +247,8 @@
       "tip": "Tip"
     },
     "planWithAi": "Create an AI plan for this city",
-    "searchFlights": "Search flights"
+    "searchFlights": "Search flights",
+    "checkVisa": "Check visa status"
   },
   "planner": {
     "title": "AI Travel Planner",
@@ -395,6 +397,40 @@
     "planner": {
       "title": "AI Travel Planner — Aviawings",
       "description": "Create a personal travel itinerary tuned to your taste with our AI-powered planner."
+    },
+    "visa": {
+      "title": "Visa Check — Aviawings",
+      "description": "Which countries need a visa for your passport? Check instantly: visa-free, e-visa, visa on arrival."
     }
+  },
+  "visa": {
+    "title": "Visa Check",
+    "subtitle": "Pick your passport and destination — instantly see whether you need a visa.",
+    "passport": "Passport country",
+    "destination": "Destination country",
+    "selectCountry": "Select a country",
+    "status": {
+      "visa_free": "No visa required",
+      "visa_free_days": "No visa required · up to {days} days",
+      "e_visa": "e-Visa required",
+      "visa_on_arrival": "Visa on arrival",
+      "eta": "Electronic travel authorization (eTA) required",
+      "visa_required": "Visa required",
+      "no_admission": "Entry restricted",
+      "self": "Your own country — no visa needed"
+    },
+    "desc": {
+      "visa_free": "You can travel visa-free with this passport. Make sure it stays valid for at least 6 months beyond your return date.",
+      "e_visa": "Apply for an e-visa online before you travel. Applications are usually processed within a few business days.",
+      "visa_on_arrival": "You can obtain your visa at the border on arrival. Bring photos and cash for the fee.",
+      "eta": "Obtain an electronic travel authorization online before travelling; it usually takes minutes.",
+      "visa_required": "You need to obtain a visa from a consulate or embassy before travelling. Apply early.",
+      "no_admission": "This route appears to have entry restrictions; consult official authorities for details.",
+      "self": "No visa is needed to travel to your own country."
+    },
+    "checking": "Checking…",
+    "updated": "Data updated: {date}",
+    "disclaimer": "This information comes from open data and can change; always verify with official sources before you travel.",
+    "source": "Source: Passport Index open dataset"
   }
 }

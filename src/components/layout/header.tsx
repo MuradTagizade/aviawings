@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { key: "flights", href: "/" },
   { key: "destinations", href: "/destinations" },
+  { key: "visa", href: "/visa" },
   { key: "planner", href: "/planner", icon: Sparkles },
 ] as const;
 
