@@ -2,7 +2,7 @@
 
 > Bu dosya, projenin tüm geçmişini ve kritik kararlarını özetler.
 > **Yeni bir konuşma penceresinde çalışmaya başlamadan önce bu dosyayı oku.**
-> Son güncelleme: 5 Temmuz 2026
+> Son güncelleme: 6 Temmuz 2026
 
 ## 1. Proje Kimliği
 
@@ -90,6 +90,23 @@ partner linkine yönlendirir (yeni sekme), ödeme partnerde olur, komisyon kazan
   ileride Travelpayouts Data API'ye geçilebilir.
 - Sağlayıcı önerileri kullanıcıya iletildi: Travelpayouts (bireysel kabul, ana ağ),
   Kiwi.com, Trip.com, Booking (oteller için) vb.
+
+## 7.6 UI/Metin Güncellemeleri (6 Tem 2026)
+
+- **Slogan değişti:** "Zarafetle uç" → "Ucuza uç" (hero + footer tagline `common.tagline`),
+  9 dilde çevrildi — affiliate/ucuz fiyat konumlandırmasına uygun.
+- **"Nereye gitsem?" bölümü yenilendi:** Yatay kaydırma şeridi yerine 3D yelpaze kart
+  destesi — yeni genel amaçlı bileşen `src/components/ui/card-stack.tsx`. Sürükle/tıkla/
+  klavye/nokta+ok navigasyonu, otomatik ilerleme (hover'da durur, reduced-motion'da
+  kapanır). Kart genişliği konteyner ölçümünden türetilir (mobil uyumlu). Kartların
+  rehber/planlayıcı linkleri korundu.
+- **Popüler rotalar mobilde gizlendi** (`hidden sm:block`) — mobil ana sayfa hero'dan
+  direkt kart destesine geçiyor.
+- 2 lint hatası düzeltildi: `visa-client.tsx` effect içi sync setState → türetilmiş
+  state; ana sayfa ISR `Date.now()` kullanımı için eslint-disable + açıklama.
+- **Not:** Bir push'ta Vercel otomatik deploy tetiklenmedi, `npx vercel deploy --prod
+  --yes` ile manuel deploy edildi; sonraki push'ta otomatik çalıştı — tekrarlarsa
+  GitHub entegrasyonunu kontrol et.
 
 ## 8. Sonraki Muhtemel Adımlar
 
