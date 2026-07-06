@@ -49,8 +49,11 @@ Next.js 16 (App Router, Turbopack) · TypeScript · Tailwind v4 (token tabanlı)
 
 - `OPENROUTER_API_KEY` = **girili ve test edildi** (model: `google/gemini-2.5-flash`). Kullanıcıya harcama limiti önerildi.
 - `DUFFEL_ACCESS_TOKEN` = **girili ve test edildi** (test modu; gerçek havayolları dönüyor, fiyatlar GBP → kur dönüşümü halledildi)
-- Supabase, GA4, Meta Pixel = **henüz boş** (kullanıcı hesap açınca girecek). Vercel'e de env'ler manuel eklenmeli!
-- `NEXT_PUBLIC_SITE_URL` deploy sonrası gerçek adresle güncellenmeli.
+- Supabase, GA4, Meta Pixel = **henüz boş** (kullanıcı hesap açınca girecek).
+- **Vercel production env'leri girildi (6 Tem 2026):** OPENROUTER_API_KEY, OPENROUTER_MODEL,
+  DUFFEL_ACCESS_TOKEN, NEXT_PUBLIC_SITE_URL=https://aviawings.vercel.app — AI planlayıcı
+  canlıda AKTİF (503 "çok yakında" sorunu buydu). Proje `vercel link` ile bağlı
+  (hesap: trendgoaz-5717), env eklemek için: `npx vercel env add <NAME> production`.
 
 ## 6. Kritik Kararlar ve Nedenleri
 
