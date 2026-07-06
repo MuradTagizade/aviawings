@@ -55,6 +55,7 @@ export default async function HomePage({
       />
       <Hero />
       <PopularRoutes />
+      {/* eslint-disable-next-line react-hooks/purity -- intentional: ISR page (revalidate=14400), Date.now() runs once per regeneration to pick the 4-hour rotation window */}
       <Inspiration items={pickInspiration(Math.floor(Date.now() / ROTATION_WINDOW_MS))} />
       <PlannerBanner />
       <WhyUs />

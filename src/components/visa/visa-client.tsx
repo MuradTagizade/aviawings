@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
@@ -179,20 +179,16 @@ export function VisaClient({ countryCodes }: { countryCodes: string[] }) {
   const [mode, setMode] = useState<"check" | "map">(
     sp.get("mode") === "map" ? "map" : "check"
   );
-  const [passport, setPassport] = useState(
-    () => sp.get("passport")?.toUpperCase() ?? market.countryCode
+  // Explicit choice (URL param or user pick); until then the market default
+  // applies — market resolves from a cookie after mount, so derive instead of
+  // syncing state in an effect.
+  const [passportChoice, setPassportChoice] = useState(
+    () => sp.get("passport")?.toUpperCase() ?? ""
   );
+  const passport = passportChoice || market.countryCode;
   const [destination, setDestination] = useState(
     () => sp.get("destination")?.toUpperCase() ?? ""
   );
-
-  // Market resolves from a cookie after mount — fill the passport default
-  // in once known, unless the user (or the URL) already picked one.
-  useEffect(() => {
-    if (!sp.get("passport")) {
-      setPassport((p) => p || market.countryCode);
-    }
-  }, [market.countryCode, sp]);
 
   const { countries, nameOf } = useMemo(() => {
     let dn: Intl.DisplayNames | null = null;
@@ -289,7 +285,7 @@ export function VisaClient({ countryCodes }: { countryCodes: string[] }) {
               <CountrySelect
                 label={t("passport")}
                 value={passport}
-                onChange={setPassport}
+                onChange={setPassportChoice}
                 countries={countries}
                 placeholder={t("selectCountry")}
               />
@@ -361,7 +357,7 @@ export function VisaClient({ countryCodes }: { countryCodes: string[] }) {
               <CountrySelect
                 label={t("passport")}
                 value={passport}
-                onChange={setPassport}
+                onChange={setPassportChoice}
                 countries={countries}
                 placeholder={t("selectCountry")}
               />
