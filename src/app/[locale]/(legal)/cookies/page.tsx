@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { LegalShell } from "@/components/legal-page";
+import { contentLocale } from "@/lib/locale";
 
 export const metadata: Metadata = { title: "Cookies" };
 
@@ -84,7 +85,7 @@ export default async function CookiesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const c = CONTENT[locale as "tr" | "en"] ?? CONTENT.en;
+  const c = CONTENT[contentLocale(locale)];
   return (
     <LegalShell locale={locale} title={c.title}>
       {c.body}

@@ -1,4 +1,15 @@
-export const CURRENCIES = ["AZN", "TRY", "USD", "EUR"] as const;
+import { intlLocale } from "@/lib/locale";
+
+export const CURRENCIES = [
+  "AZN",
+  "TRY",
+  "USD",
+  "EUR",
+  "GEL",
+  "KZT",
+  "UZS",
+  "KGS",
+] as const;
 export type Currency = (typeof CURRENCIES)[number];
 
 // Approximate static rates (1 USD = X). Replace with a live FX feed
@@ -11,6 +22,10 @@ const RATES_PER_USD: Record<string, number> = {
   AZN: 1.7,
   GBP: 0.79,
   CHF: 0.88,
+  GEL: 2.7,
+  KZT: 520,
+  UZS: 12800,
+  KGS: 87,
 };
 
 const SYMBOLS: Record<Currency, string> = {
@@ -18,6 +33,10 @@ const SYMBOLS: Record<Currency, string> = {
   TRY: "₺",
   USD: "$",
   EUR: "€",
+  GEL: "₾",
+  KZT: "₸",
+  UZS: "soʻm",
+  KGS: "сом",
 };
 
 export function convert(
@@ -38,7 +57,7 @@ export function formatMoney(
   locale: string
 ): string {
   const rounded = Math.round(amount);
-  const formatted = new Intl.NumberFormat(locale === "tr" ? "tr-TR" : "en-US", {
+  const formatted = new Intl.NumberFormat(intlLocale(locale), {
     maximumFractionDigits: 0,
   }).format(rounded);
   return `${formatted} ${SYMBOLS[currency]}`;

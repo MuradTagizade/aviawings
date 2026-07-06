@@ -3,7 +3,8 @@ import { Fraunces, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
+import { OG_LOCALES } from "@/lib/locale";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -36,9 +37,6 @@ export const viewport: Viewport = {
   ],
 };
 
-/** Applies the saved (or system) theme before first paint to avoid a flash. */
-const themeInitScript = `try{var t=localStorage.getItem("aw-theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`;
-
 export async function generateMetadata({
   params,
 }: {
@@ -56,12 +54,12 @@ export async function generateMetadata({
       process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
     ),
     alternates: {
-      languages: { tr: "/tr", en: "/en" },
+      languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
     },
     openGraph: {
       siteName: "Aviawings",
       type: "website",
-      locale: locale === "tr" ? "tr_TR" : "en_US",
+      locale: OG_LOCALES[locale as Locale] ?? "en_US",
     },
   };
 }
@@ -85,8 +83,12 @@ export default async function LocaleLayout({
       className={`${fraunces.variable} ${inter.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        {/* async + src → React 19 hoists this as a resource (no client-render
+            script warning); applies the saved theme before hydration. */}
+        <script async src="/theme-init.js" />
+      </head>
       <body className="flex min-h-screen flex-col">
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <NextIntlClientProvider>
           <Providers>
             <Header />

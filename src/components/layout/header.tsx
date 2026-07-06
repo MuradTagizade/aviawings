@@ -8,6 +8,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { Logo } from "@/components/logo";
 import { CurrencySwitcher } from "./currency-switcher";
 import { LocaleSwitcher } from "./locale-switcher";
+import { MarketSwitcher } from "./market-switcher";
 import { ThemeToggle } from "./theme-toggle";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
@@ -85,6 +86,7 @@ export function Header() {
 
           <div className="hidden items-center gap-2 md:flex">
             <ThemeToggle />
+            <MarketSwitcher />
             <CurrencySwitcher />
             <LocaleSwitcher />
             {authEnabled && (
@@ -156,8 +158,9 @@ export function Header() {
                   </Link>
                 </motion.div>
               )}
-              <div className="mt-auto flex items-center justify-between gap-3 pt-8">
+              <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-8">
                 <ThemeToggle />
+                <MarketSwitcher />
                 <CurrencySwitcher />
                 <LocaleSwitcher />
               </div>

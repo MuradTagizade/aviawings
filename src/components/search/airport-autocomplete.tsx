@@ -7,6 +7,7 @@ import { PlaneLanding, PlaneTakeoff } from "lucide-react";
 import { searchAirports, type Airport } from "@/lib/airports";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { cn } from "@/lib/utils";
+import { contentLocale } from "@/lib/locale";
 
 export function AirportAutocomplete({
   value,
@@ -21,7 +22,7 @@ export function AirportAutocomplete({
   label: string;
   kind: "origin" | "destination";
 }) {
-  const locale = useLocale() as "tr" | "en";
+  const locale = contentLocale(useLocale());
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(0);

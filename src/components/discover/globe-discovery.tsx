@@ -21,7 +21,7 @@ interface WikiInfo {
 
 export function GlobeDiscovery() {
   const t = useTranslations("discover");
-  const locale = useLocale() as "tr" | "en";
+  const locale = useLocale();
 
   const mapRef = useRef<MapLibreGL.Map | null>(null);
   const idleSpinRef = useRef(true);
@@ -37,7 +37,7 @@ export function GlobeDiscovery() {
     if (!gem) return "";
     try {
       return (
-        new Intl.DisplayNames([locale === "tr" ? "tr" : "en"], { type: "region" }).of(
+        new Intl.DisplayNames([locale], { type: "region" }).of(
           gem.countryCode
         ) ?? gem.countryCode
       );
@@ -111,9 +111,12 @@ export function GlobeDiscovery() {
           {
             role: "user",
             content:
-              locale === "tr"
-                ? `${next.name} (${next.countryCode}) hakkında beni oraya gitmeye ikna edecek 2 kısa, büyüleyici cümle yaz. Selamlama olmadan direkt başla.`
-                : `Write 2 short, enchanting sentences that would convince me to visit ${next.name} (${next.countryCode}). Start directly, no greeting.`,
+              {
+                tr: `${next.name} (${next.countryCode}) hakkında beni oraya gitmeye ikna edecek 2 kısa, büyüleyici cümle yaz. Selamlama olmadan direkt başla.`,
+                az: `${next.name} (${next.countryCode}) haqqında məni oraya getməyə inandıracaq 2 qısa, valehedici cümlə yaz. Salamlaşma olmadan birbaşa başla.`,
+                ru: `Напиши 2 коротких, чарующих предложения о ${next.name} (${next.countryCode}), которые убедят меня туда поехать. Начни сразу, без приветствия.`,
+              }[locale] ??
+              `Write 2 short, enchanting sentences that would convince me to visit ${next.name} (${next.countryCode}). Start directly, no greeting.`,
           },
         ],
       }),

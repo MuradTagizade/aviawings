@@ -46,7 +46,7 @@
     "cookies": "Cookie Policy",
     "terms": "Terms of Service",
     "cookieSettings": "Cookie preferences",
-    "note": "Aviawings is a travel technology platform. Ticketing is fulfilled through our licensed agency partners.",
+    "note": "Aviawings is a flight metasearch platform. Bookings and payments are completed on our partners' sites; we may earn a commission at no extra cost to you.",
     "rights": "All rights reserved."
   },
   "home": {
@@ -107,7 +107,7 @@
     "resultsCount": "{count, plural, =0 {No flights found} =1 {1 flight found} other {# flights found}}",
     "noResults": "No flights found for this date",
     "noResultsSub": "Try a different date or a nearby airport.",
-    "demoNotice": "You're viewing sample data. Live ticketing is coming very soon!",
+    "demoNotice": "Prices are indicative — the final price is shown on the partner site where you complete your booking.",
     "sort": {
       "label": "Sort",
       "best": "Best",

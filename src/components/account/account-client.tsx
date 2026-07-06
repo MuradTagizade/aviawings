@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
+import { contentLocale } from "@/lib/locale";
 
 type Tab = "trips" | "favorites" | "alerts" | "profile";
 
@@ -63,7 +64,8 @@ export function AccountClient() {
   const t = useTranslations("account");
   const ta = useTranslations("auth");
   const tn = useTranslations("nav");
-  const locale = useLocale() as "tr" | "en";
+  const tsw = useTranslations("searchWidget");
+  const locale = contentLocale(useLocale());
   const router = useRouter();
   const { user, loading } = useAuthUser();
 
@@ -294,7 +296,7 @@ export function AccountClient() {
           <div className="space-y-5">
             <div className="rounded-2xl border border-ink/5 bg-surface p-6 shadow-soft">
               <div className="grid gap-3 sm:grid-cols-[1fr_1fr_120px_auto] sm:items-end">
-                <Field label={locale === "tr" ? "Nereden" : "From"}>
+                <Field label={tsw("from")}>
                   <select
                     value={alertFrom}
                     onChange={(e) => setAlertFrom(e.target.value)}
@@ -307,7 +309,7 @@ export function AccountClient() {
                     ))}
                   </select>
                 </Field>
-                <Field label={locale === "tr" ? "Nereye" : "To"}>
+                <Field label={tsw("to")}>
                   <select
                     value={alertTo}
                     onChange={(e) => setAlertTo(e.target.value)}

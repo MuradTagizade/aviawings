@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { Compass, Globe2, Rocket, ShieldCheck } from "lucide-react";
 import { FadeIn } from "@/components/fade-in";
+import { contentLocale } from "@/lib/locale";
 
 export const metadata: Metadata = { title: "About" };
 
@@ -37,7 +38,7 @@ export default async function AboutPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const c = CONTENT[locale as "tr" | "en"] ?? CONTENT.en;
+  const c = CONTENT[contentLocale(locale)];
 
   return (
     <div className="mx-auto max-w-4xl px-4 pb-24 pt-32 sm:px-6">

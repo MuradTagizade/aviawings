@@ -4,7 +4,7 @@ import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 const paramsSchema = z.object({
   q: z.string().min(2).max(120),
-  lang: z.enum(["tr", "en"]).default("en"),
+  lang: z.enum(["az", "tr", "en", "ru", "ka", "tk", "kk", "uz", "ky"]).default("en"),
 });
 
 interface WikiSummary {
@@ -33,7 +33,7 @@ async function fetchSummary(lang: string, title: string): Promise<WikiSummary | 
   };
 }
 
-/** English article title → its Turkish counterpart via Wikipedia langlinks */
+/** English article title → its counterpart in the target language via Wikipedia langlinks */
 async function langlinkTitle(enTitle: string, target: string): Promise<string | null> {
   const res = await fetch(
     `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(enTitle)}&prop=langlinks&lllang=${target}&format=json&redirects=1`,
@@ -100,12 +100,12 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "not_found" }, { status: 404 });
     }
 
-    // 3. Prefer a localized extract when the user browses in Turkish —
-    //    follow the langlink (e.g. "Hagia Sophia" → "Ayasofya")
-    if (lang === "tr") {
-      const trTitle = await langlinkTitle(summary.title, "tr");
-      if (trTitle) {
-        const localized = await fetchSummary("tr", trTitle);
+    // 3. Prefer a localized extract when the user browses in another
+    //    language — follow the langlink (e.g. "Hagia Sophia" → "Ayasofya")
+    if (lang !== "en") {
+      const localTitle = await langlinkTitle(summary.title, lang);
+      if (localTitle) {
+        const localized = await fetchSummary(lang, localTitle);
         if (localized?.extract) {
           summary = {
             ...localized,

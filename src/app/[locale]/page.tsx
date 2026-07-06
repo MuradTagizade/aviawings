@@ -5,6 +5,10 @@ import { PopularRoutes } from "@/components/home/popular-routes";
 import { Inspiration } from "@/components/home/inspiration";
 import { PlannerBanner } from "@/components/home/planner-banner";
 import { WhyUs } from "@/components/home/why-us";
+import { pickInspiration, ROTATION_WINDOW_MS } from "@/content/inspiration-pool";
+
+/** Re-render every 4 hours so the featured inspiration set rotates. */
+export const revalidate = 14400;
 
 export async function generateMetadata({
   params,
@@ -38,7 +42,7 @@ export default async function HomePage({
         "@type": "WebSite",
         name: "Aviawings",
         url: base,
-        inLanguage: ["tr", "en"],
+        inLanguage: ["az", "tr", "en", "ru"],
       },
     ],
   };
@@ -51,7 +55,7 @@ export default async function HomePage({
       />
       <Hero />
       <PopularRoutes />
-      <Inspiration />
+      <Inspiration items={pickInspiration(Math.floor(Date.now() / ROTATION_WINDOW_MS))} />
       <PlannerBanner />
       <WhyUs />
     </>

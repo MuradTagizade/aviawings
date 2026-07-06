@@ -47,6 +47,7 @@ import {
   type ExportPlan,
 } from "@/lib/plan-export";
 import { addDays, cn, formatDateISO } from "@/lib/utils";
+import { intlLocale } from "@/lib/locale";
 
 /* ——— Types ——— */
 
@@ -111,7 +112,8 @@ const DESTINATION_SUGGESTIONS = [
 export function PlannerClient() {
   const t = useTranslations("planner");
   const tq = useTranslations("planner.quiz");
-  const locale = useLocale() as "tr" | "en";
+  const tc = useTranslations("common");
+  const locale = useLocale();
   const sp = useSearchParams();
 
   const presetDest = sp.get("destination");
@@ -138,7 +140,7 @@ export function PlannerClient() {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const months = useMemo(() => {
-    const fmt = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
+    const fmt = new Intl.DateTimeFormat(intlLocale(locale), {
       month: "long",
     });
     const now = new Date();
@@ -856,9 +858,7 @@ export function PlannerClient() {
 
       {error && (
         <p className="mt-6 rounded-xl bg-coral-soft px-4 py-3 text-center text-sm text-coral">
-          {locale === "tr"
-            ? "Plan oluşturulamadı. Lütfen tekrar deneyin."
-            : "Couldn't create the plan. Please try again."}
+          {tc("error")} — {tc("retry")}
         </p>
       )}
 
@@ -1118,7 +1118,7 @@ export function PlannerClient() {
           className="flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium text-ink-soft transition-colors hover:bg-sand disabled:opacity-0"
         >
           <ArrowLeft className="h-4 w-4" />
-          {locale === "tr" ? "Geri" : "Back"}
+          {tc("back")}
         </button>
         {step < TOTAL_STEPS - 1 ? (
           <button
@@ -1126,7 +1126,7 @@ export function PlannerClient() {
             disabled={!canProceed}
             className="flex h-11 items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-cream transition-all hover:bg-ink/90 disabled:opacity-40"
           >
-            {locale === "tr" ? "Devam" : "Continue"}
+            {tc("next")}
             <ArrowRight className="h-4 w-4" />
           </button>
         ) : (

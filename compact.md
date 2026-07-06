@@ -73,12 +73,52 @@ Next.js 16 (App Router, Turbopack) · TypeScript · Tailwind v4 (token tabanlı)
 - Kullanıcıya Türkçe yanıt verilir; teknik terimler İngilizce kalabilir.
 - Global skills: `~/.claude/skills/` altına ui-ux-pro-max ailesi kuruldu (kullanıcı istedi).
 
+## 7.5 İŞ MODELİ DEĞİŞTİ: AFFILIATE (5 Tem 2026)
+
+Bilet SATILMAYACAK — metasearch/affiliate modeli: "Seç" butonu yolcuyu marker'lı
+partner linkine yönlendirir (yeni sekme), ödeme partnerde olur, komisyon kazanılır.
+- `src/lib/affiliate.ts`: `NEXT_PUBLIC_SALES_MODE` (affiliate|internal, varsayılan
+  affiliate) + `NEXT_PUBLIC_TP_MARKER` (Travelpayouts marker'ı — KULLANICI KAYIT OLUP
+  GİRECEK). Aviasales deep-link formatı Travelpayouts link builder'ı ile DOĞRULANMALI.
+- Affiliate modda /booking kapalı (eski akış `internal` moduyla geri gelir — Duffel V2
+  ihtimali için silinmedi). Footer notu 9 dilde affiliate açıklamasına çevrildi;
+  results bildirimi "fiyatlar yaklaşık, kesin fiyat partner sitede" oldu.
+- Sonuç fiyatları hâlâ Duffel-test/mock'tan geliyor → partner fiyatıyla birebir değil;
+  ileride Travelpayouts Data API'ye geçilebilir.
+- Sağlayıcı önerileri kullanıcıya iletildi: Travelpayouts (bireysel kabul, ana ağ),
+  Kiwi.com, Trip.com, Booking (oteller için) vb.
+
 ## 8. Sonraki Muhtemel Adımlar
 
 1. Supabase projesi açılınca: env'leri gir (yerel + Vercel), migration'ı SQL Editor'da çalıştır, Google provider'ı aç (redirect: `https://<site>/auth/callback`)
 2. GA4 + Meta Pixel ID'leri gelince env'e ekle (kod hazır, sadece ID bekliyor)
 3. `NEXT_PUBLIC_SITE_URL`'i gerçek Vercel adresiyle güncelle + redeploy
 4. V2: Duffel gerçek biletleme (offer→order) + ödeme, fiyat alarmı e-postaları (Supabase Edge Functions), oteller
-5. V3: eSIM, AZ/RU dilleri (`src/messages/` + `routing.ts`), canlı kur, mobil uygulama
+5. V3: eSIM, canlı kur, mobil uygulama. ~~AZ/RU dilleri~~ → **TAMAMLANDI, sonra genişletildi
+   (5 Tem 2026): 9 dil** — az/tr/en/ru/ka(Gürcüce)/tk(Türkmence)/kk(Kazakça)/uz(Özbekçe)/ky(Kırgızca).
+   - UI mesajları 9 dilde tam (`src/messages/*.json`; yeni 5 dil AI çevirisi — native review önerilir)
+   - Dil seçici dropdown'a dönüştü (`locale-switcher.tsx`, native adlar `LOCALE_NAMES`)
+   - Editoryal içerik TR/EN; `contentLocale()`: Türk dilleri→tr, ka/ru→en fallback
+   - **Pazar kişiselleştirme:** popüler rotalar dile göre o pazardan kalkıyor
+     (`src/content/popular-routes.ts`), footer+contact sosyal medya/telefon dile göre
+     (`src/lib/regional.ts` — telefonlar/hesaplar PLACEHOLDER, gerçekleri girilmeli)
+   - **İlham havuzu:** 56 global destinasyon, 4 saatte bir deterministik 10'lu rotasyon
+     (`src/content/inspiration-pool.ts`, ana sayfa `revalidate=14400` ISR). Rehberi olmayan
+     kartlar AI planner'a gider. Tüm görseller tek tek vizüel doğrulandı.
+   - Yeni havalimanları: NQZ, FRU, ASB, BUS. AI planner/chat 9 dilde yanıt veriyor;
+     Wikipedia özetleri langlink ile yerelleşiyor.
+   - Tema init script'i `public/theme-init.js`'e taşındı (`<script async src>`) — React 19
+     "script tag while rendering" konsol hatası çözüldü.
+   - **MARKET SİSTEMİ (Skyscanner modeli, 5 Tem 2026):** pazar ≠ dil ≠ para birimi.
+     8 market: AZ/TR/GE/TM/KZ/UZ/KG/GLOBAL (`src/lib/market.ts` — tek kaynak).
+     Geo-IP tespiti middleware'de (`src/proxy.ts`, Vercel `x-vercel-ip-country`) →
+     `aw-market` cookie (1 yıl) → kök ziyarette pazarın diline yönlendirme
+     (Accept-Language ∩ pazar dilleri, yoksa pazar varsayılanı). Header'da bayraklı
+     MarketSwitcher; pazar değişince para birimi otomatik, dil pazar dışıysa varsayılana
+     atlar. Dil seçici sadece pazarın dillerini gösterir (yerel+EN+RU). Pazar bazlı
+     içerik: rotalar (`ROUTES_BY_MARKET`), iletişim/sosyal (`REGIONAL_CONTACTS`,
+     market-keyed), vize varsayılan pasaportu. Yeni para birimleri: GEL/KZT/UZS/KGS
+     (statik kur, canlı feed TODO). İleride ülkeye özel satış = market koduna bağlanacak.
+     Client'ta market: `useMarket()` hook (SSR fallback dilden türer, cookie sonra düzeltir).
 6. Vize verisini periyodik güncelle; ileride iVisa affiliate butonu (sonuç kartına tek buton)
 7. Alan adı alınınca marka adı değişimi (Logo + mesajlar + manifest + PRD)

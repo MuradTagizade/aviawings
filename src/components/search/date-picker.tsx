@@ -7,6 +7,7 @@ import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { formatDateISO } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { intlLocale } from "@/lib/locale";
 
 interface DateRange {
   depart: Date | null;
@@ -60,18 +61,18 @@ export function DatePicker({
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, () => setOpen(false), open);
 
-  const fmt = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
+  const fmt = new Intl.DateTimeFormat(intlLocale(locale), {
     day: "numeric",
     month: "short",
     weekday: "short",
   });
-  const monthFmt = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
+  const monthFmt = new Intl.DateTimeFormat(intlLocale(locale), {
     month: "long",
     year: "numeric",
   });
   const weekdays = useMemo(() => {
     const base = new Date(2024, 0, 1); // a Monday
-    const wf = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
+    const wf = new Intl.DateTimeFormat(intlLocale(locale), {
       weekday: "short",
     });
     return Array.from({ length: 7 }, (_, i) =>

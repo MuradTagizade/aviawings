@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { Destination } from "@/content/destinations";
 import { addDays, formatDateISO } from "@/lib/utils";
+import { intlLocale } from "@/lib/locale";
 
 function iconFor(code: number | null) {
   if (code === null) return CloudSun;
@@ -37,7 +38,7 @@ interface ForecastDay {
 
 export function WeatherPanel({ destination }: { destination: Destination }) {
   const t = useTranslations("destinations.weather");
-  const locale = useLocale() as "tr" | "en";
+  const locale = useLocale();
   const sp = useSearchParams();
 
   const depart = sp.get("depart");
@@ -74,11 +75,11 @@ export function WeatherPanel({ destination }: { destination: Destination }) {
     },
   });
 
-  const dayFmt = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
+  const dayFmt = new Intl.DateTimeFormat(intlLocale(locale), {
     weekday: "short",
     day: "numeric",
   });
-  const monthFmt = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
+  const monthFmt = new Intl.DateTimeFormat(intlLocale(locale), {
     month: "long",
   });
 
@@ -106,7 +107,16 @@ export function WeatherPanel({ destination }: { destination: Destination }) {
             <Droplets className="mx-auto h-5 w-5 text-sky" />
             <p className="mt-2 font-display text-2xl text-ink">{rainDays}</p>
             <p className="text-xs text-ink-faint">
-              {locale === "tr" ? "yağışlı gün/ay" : "rainy days/mo"}
+              {{
+                tr: "yağışlı gün/ay",
+                az: "yağışlı gün/ay",
+                ru: "дождл. дней/мес",
+                ka: "წვიმიანი დღე/თვე",
+                tk: "ýagyşly gün/aý",
+                kk: "жаңбырлы күн/ай",
+                uz: "yomgʻirli kun/oy",
+                ky: "жамгырлуу күн/ай",
+              }[locale] ?? "rainy days/mo"}
             </p>
           </div>
         </div>

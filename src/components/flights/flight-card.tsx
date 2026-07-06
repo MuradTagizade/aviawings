@@ -9,13 +9,14 @@ import { findAirport } from "@/lib/airports";
 import { convert, formatMoney } from "@/lib/currency";
 import { usePreferences } from "@/stores/preferences";
 import { cn, formatDuration } from "@/lib/utils";
+import { contentLocale } from "@/lib/locale";
 
 function timeOf(iso: string) {
   return iso.slice(11, 16);
 }
 
-function cityOf(iata: string, locale: "tr" | "en") {
-  return findAirport(iata)?.city[locale] ?? iata;
+function cityOf(iata: string, locale: string) {
+  return findAirport(iata)?.city[contentLocale(locale)] ?? iata;
 }
 
 /** Deterministic soft color per airline code for the monogram */
@@ -47,7 +48,7 @@ function ItineraryRow({
   itinerary: FlightItinerary;
   label?: string;
 }) {
-  const locale = useLocale() as "tr" | "en";
+  const locale = useLocale();
   const t = useTranslations("results");
   const tc = useTranslations("common");
   const first = itinerary.segments[0];
@@ -121,7 +122,7 @@ export function FlightCard({
   index: number;
 }) {
   const t = useTranslations("results");
-  const locale = useLocale() as "tr" | "en";
+  const locale = useLocale();
   const { currency } = usePreferences();
   const [expanded, setExpanded] = useState(false);
 

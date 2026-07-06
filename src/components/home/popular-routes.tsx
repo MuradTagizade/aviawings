@@ -7,48 +7,16 @@ import { MoveRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { findAirport } from "@/lib/airports";
 import { addDays, formatDateISO } from "@/lib/utils";
+import { contentLocale } from "@/lib/locale";
+import { CITY_IMAGES, routesForMarket } from "@/content/popular-routes";
+import { useMarket } from "@/hooks/use-market";
 import { SectionHeader } from "@/components/fade-in";
-
-const ROUTES: { from: string; to: string; image: string }[] = [
-  {
-    from: "IST",
-    to: "GYD",
-    image: "/img/destinations/baku-hero.jpg",
-  },
-  {
-    from: "GYD",
-    to: "IST",
-    image:
-      "https://images.unsplash.com/photo-1527838832700-5059252407fa?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    from: "IST",
-    to: "LHR",
-    image:
-      "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    from: "GYD",
-    to: "DXB",
-    image:
-      "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    from: "ESB",
-    to: "GYD",
-    image: "/img/destinations/baku-maiden-tower.jpg",
-  },
-  {
-    from: "IST",
-    to: "CDG",
-    image:
-      "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
-  },
-];
 
 export function PopularRoutes() {
   const t = useTranslations("home");
-  const locale = useLocale() as "tr" | "en";
+  const locale = contentLocale(useLocale());
+  const market = useMarket();
+  const routes = routesForMarket(market.code);
 
   const depart = formatDateISO(addDays(new Date(), 14));
   const ret = formatDateISO(addDays(new Date(), 21));
@@ -57,9 +25,10 @@ export function PopularRoutes() {
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
       <SectionHeader title={t("popularRoutes")} subtitle={t("popularRoutesSub")} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {ROUTES.map((r, i) => {
+        {routes.map((r, i) => {
           const from = findAirport(r.from)!;
           const to = findAirport(r.to)!;
+          const image = CITY_IMAGES[r.to] ?? CITY_IMAGES[r.from];
           return (
             <motion.div
               key={`${r.from}-${r.to}`}
@@ -73,7 +42,7 @@ export function PopularRoutes() {
                 className="group relative block h-44 overflow-hidden rounded-2xl shadow-card transition-shadow duration-300 hover:shadow-lift"
               >
                 <Image
-                  src={r.image}
+                  src={image}
                   alt={`${from.city[locale]} → ${to.city[locale]}`}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

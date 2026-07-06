@@ -14,9 +14,11 @@ import { convert, formatMoney } from "@/lib/currency";
 import { usePreferences } from "@/stores/preferences";
 import { useBooking } from "@/stores/booking";
 import { trackEvent } from "@/lib/analytics";
+import { affiliateLink, SALES_MODE } from "@/lib/affiliate";
 import { SearchWidget } from "@/components/search/search-widget";
 import { FlightCard } from "./flight-card";
 import { addDays, cn, formatDateISO } from "@/lib/utils";
+import { contentLocale, intlLocale } from "@/lib/locale";
 
 type SortKey = "best" | "cheapest" | "fastest";
 type StopFilter = "any" | "direct" | "max1";
@@ -48,7 +50,8 @@ function inTimeBucket(hour: number, bucket: keyof typeof TIME_BUCKETS) {
 export function ResultsClient() {
   const t = useTranslations("results");
   const tf = useTranslations("results.filters");
-  const locale = useLocale() as "tr" | "en";
+  const locale = useLocale();
+  const cLocale = contentLocale(locale);
   const router = useRouter();
   const sp = useSearchParams();
   const { currency } = usePreferences();
@@ -170,6 +173,15 @@ export function ResultsClient() {
   function selectOffer(offer: FlightOffer) {
     if (!search) return;
     trackEvent("select_item", { item_id: offer.id, price: offer.price.total });
+    if (SALES_MODE === "affiliate") {
+      // Metasearch model: hand over to the partner site with our marker —
+      // payment happens there, we earn the commission.
+      trackEvent("affiliate_click", {
+        route: `${search.origin}-${search.destination}`,
+      });
+      window.open(affiliateLink(search), "_blank", "noopener");
+      return;
+    }
     setBooking(offer, search);
     router.push("/booking");
   }
@@ -186,14 +198,14 @@ export function ResultsClient() {
     );
   }
 
-  const fromCity = findAirport(search.origin)?.city[locale] ?? search.origin;
-  const toCity = findAirport(search.destination)?.city[locale] ?? search.destination;
+  const fromCity = findAirport(search.origin)?.city[cLocale] ?? search.origin;
+  const toCity = findAirport(search.destination)?.city[cLocale] ?? search.destination;
   const destGuide = findDestinationByIata(search.destination);
 
   // ±3 day flexible strip
   const baseDate = new Date(`${search.departDate}T00:00:00`);
   const flexDays = [-3, -2, -1, 0, 1, 2, 3].map((off) => addDays(baseDate, off));
-  const dayFmt = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
+  const dayFmt = new Intl.DateTimeFormat(intlLocale(locale), {
     day: "numeric",
     month: "short",
   });

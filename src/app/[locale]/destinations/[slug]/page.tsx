@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { contentLocale } from "@/lib/locale";
 import {
   Banknote,
   CalendarHeart,
@@ -34,7 +35,7 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const d = findDestination(slug);
   if (!d) return {};
-  const loc = locale as "tr" | "en";
+  const loc = contentLocale(locale);
   return {
     title: `${d.city[loc]} — ${d.country[loc]}`,
     description: d.tagline[loc],
@@ -62,7 +63,7 @@ export default async function DestinationPage({
   const d = findDestination(slug);
   if (!d) notFound();
 
-  const loc = locale as "tr" | "en";
+  const loc = contentLocale(locale);
   const t = await getTranslations({ locale, namespace: "destinations" });
 
   const depart = formatDateISO(addDays(new Date(), 14));

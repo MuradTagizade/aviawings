@@ -8,14 +8,26 @@ export interface QuizAnswers {
   days: number;
 }
 
-const LANG = { tr: "Turkish", en: "English" } as const;
+const LANG = {
+  tr: "Turkish",
+  en: "English",
+  az: "Azerbaijani",
+  ru: "Russian",
+  ka: "Georgian",
+  tk: "Turkmen",
+  kk: "Kazakh",
+  uz: "Uzbek",
+  ky: "Kyrgyz",
+} as const;
+
+export type PromptLocale = keyof typeof LANG;
 
 /**
  * The planner "skill": a senior travel designer persona with strict
  * output contracts so the UI can render itinerary cards, budgets,
  * packing lists, Wikipedia lookups and map routes reliably.
  */
-export function plannerSystemPrompt(locale: "tr" | "en") {
+export function plannerSystemPrompt(locale: PromptLocale) {
   return `You are "Avia Atlas" — the senior travel designer engine of Aviawings, a premium travel platform.
 
 ## Your expertise
@@ -76,7 +88,7 @@ export function plannerSystemPrompt(locale: "tr" | "en") {
 }`;
 }
 
-export function plannerUserPrompt(answers: QuizAnswers, locale: "tr" | "en") {
+export function plannerUserPrompt(answers: QuizAnswers, locale: PromptLocale) {
   return JSON.stringify({
     request: "Design a personal itinerary",
     destination: answers.destination,
@@ -90,7 +102,7 @@ export function plannerUserPrompt(answers: QuizAnswers, locale: "tr" | "en") {
   });
 }
 
-export function chatSystemPrompt(locale: "tr" | "en", planContext?: string) {
+export function chatSystemPrompt(locale: PromptLocale, planContext?: string) {
   return `You are "Avia Atlas", the travel companion of Aviawings — a premium flight and travel platform.
 
 - Answer in ${LANG[locale]}, warm and concise (2-3 short paragraphs max), like a well-travelled friend who knows the facts.

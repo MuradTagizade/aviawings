@@ -8,8 +8,17 @@ export function cn(...inputs: ClassValue[]) {
 export function formatDuration(minutes: number, locale: string) {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  const hu = locale === "tr" ? "sa" : "h";
-  const mu = locale === "tr" ? "dk" : "m";
+  const units: Record<string, [string, string]> = {
+    tr: ["sa", "dk"],
+    az: ["s", "dəq"],
+    ru: ["ч", "м"],
+    ka: ["სთ", "წთ"],
+    tk: ["sag", "min"],
+    kk: ["сағ", "мин"],
+    uz: ["soat", "daq"],
+    ky: ["саат", "мүн"],
+  };
+  const [hu, mu] = units[locale] ?? ["h", "m"];
   if (h === 0) return `${m}${mu}`;
   if (m === 0) return `${h}${hu}`;
   return `${h}${hu} ${m}${mu}`;

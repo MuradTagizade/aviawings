@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
+import { useMarket } from "@/hooks/use-market";
 import {
   ArrowRight,
   BadgeCheck,
@@ -106,7 +107,7 @@ function MapGroups({
 }) {
   const t = useTranslations("visa");
   const locale = useLocale();
-  const collator = new Intl.Collator(locale === "tr" ? "tr" : "en");
+  const collator = new Intl.Collator(locale);
 
   const groups: {
     key: "visa_free" | "visa_on_arrival" | "e_visa";
@@ -171,28 +172,37 @@ function MapGroups({
 
 export function VisaClient({ countryCodes }: { countryCodes: string[] }) {
   const t = useTranslations("visa");
-  const locale = useLocale() as "tr" | "en";
+  const locale = useLocale();
+  const market = useMarket();
   const sp = useSearchParams();
 
   const [mode, setMode] = useState<"check" | "map">(
     sp.get("mode") === "map" ? "map" : "check"
   );
   const [passport, setPassport] = useState(
-    () => sp.get("passport")?.toUpperCase() ?? (locale === "tr" ? "TR" : "")
+    () => sp.get("passport")?.toUpperCase() ?? market.countryCode
   );
   const [destination, setDestination] = useState(
     () => sp.get("destination")?.toUpperCase() ?? ""
   );
 
+  // Market resolves from a cookie after mount — fill the passport default
+  // in once known, unless the user (or the URL) already picked one.
+  useEffect(() => {
+    if (!sp.get("passport")) {
+      setPassport((p) => p || market.countryCode);
+    }
+  }, [market.countryCode, sp]);
+
   const { countries, nameOf } = useMemo(() => {
     let dn: Intl.DisplayNames | null = null;
     try {
-      dn = new Intl.DisplayNames([locale === "tr" ? "tr" : "en"], { type: "region" });
+      dn = new Intl.DisplayNames([locale], { type: "region" });
     } catch {
       // very old browsers — fall back to ISO codes
     }
     const lookup = (code: string) => dn?.of(code) ?? code;
-    const collator = new Intl.Collator(locale === "tr" ? "tr" : "en");
+    const collator = new Intl.Collator(locale);
     const list = countryCodes
       .map((code) => ({ code, name: lookup(code) }))
       .sort((a, b) => collator.compare(a.name, b.name));

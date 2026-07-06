@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { DESTINATIONS } from "@/content/destinations";
 import { FadeIn } from "@/components/fade-in";
 import { GlobeDiscovery } from "@/components/discover/globe-discovery";
+import { contentLocale } from "@/lib/locale";
 
 export async function generateMetadata({
   params,
@@ -25,7 +26,7 @@ export default async function DestinationsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "destinations" });
-  const loc = locale as "tr" | "en";
+  const loc = contentLocale(locale);
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-24 pt-28 sm:px-6 lg:px-8">

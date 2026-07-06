@@ -46,7 +46,7 @@
     "cookies": "Çerez Politikası",
     "terms": "Kullanım Şartları",
     "cookieSettings": "Çerez tercihleri",
-    "note": "Aviawings bir seyahat teknolojisi platformudur. Biletleme, lisanslı acente iş ortaklarımız aracılığıyla gerçekleştirilir.",
+    "note": "Aviawings bir uçuş arama (metasearch) platformudur. Rezervasyon ve ödeme, iş ortaklarımızın sitelerinde tamamlanır; size ek maliyet olmadan komisyon kazanabiliriz.",
     "rights": "Tüm hakları saklıdır."
   },
   "home": {
@@ -107,7 +107,7 @@
     "resultsCount": "{count, plural, =0 {Sonuç bulunamadı} =1 {1 uçuş bulundu} other {# uçuş bulundu}}",
     "noResults": "Bu tarih için uçuş bulunamadı",
     "noResultsSub": "Farklı bir tarih veya yakın bir havalimanı deneyin.",
-    "demoNotice": "Şu anda örnek veriler gösteriliyor. Canlı bilet satışı çok yakında!",
+    "demoNotice": "Fiyatlar yaklaşıktır — kesin fiyat, rezervasyonu tamamladığınız iş ortağı sitesinde gösterilir.",
     "sort": {
       "label": "Sırala",
       "best": "En iyi",

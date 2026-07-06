@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { intlLocale } from "@/lib/locale";
 
 export async function LegalShell({
   locale,
@@ -10,7 +11,7 @@ export async function LegalShell({
   children: React.ReactNode;
 }) {
   const t = await getTranslations({ locale, namespace: "legal" });
-  const date = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
+  const date = new Intl.DateTimeFormat(intlLocale(locale), {
     dateStyle: "long",
   }).format(new Date("2026-07-05"));
 

@@ -12,7 +12,7 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 const planBody = z.object({
   mode: z.literal("plan"),
-  locale: z.enum(["tr", "en"]),
+  locale: z.enum(["az", "tr", "en", "ru", "ka", "tk", "kk", "uz", "ky"]),
   answers: z.object({
     destination: z.string().min(2).max(80),
     when: z.string().max(30).default("flexible"),
@@ -26,7 +26,7 @@ const planBody = z.object({
 
 const chatBody = z.object({
   mode: z.literal("chat"),
-  locale: z.enum(["tr", "en"]),
+  locale: z.enum(["az", "tr", "en", "ru", "ka", "tk", "kk", "uz", "ky"]),
   planContext: z.string().max(4000).optional(),
   messages: z
     .array(

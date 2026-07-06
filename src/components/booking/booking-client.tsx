@@ -26,6 +26,8 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { cn, formatDuration } from "@/lib/utils";
+import { contentLocale } from "@/lib/locale";
+import { SALES_MODE } from "@/lib/affiliate";
 
 const passengerSchema = z.object({
   firstName: z.string().min(2),
@@ -56,7 +58,7 @@ function makeBookingCode() {
 export function BookingClient() {
   const t = useTranslations("booking");
   const tc = useTranslations("common");
-  const locale = useLocale() as "tr" | "en";
+  const locale = useLocale();
   const router = useRouter();
   const { offer, search, clear } = useBooking();
   const { currency } = usePreferences();
@@ -96,6 +98,22 @@ export function BookingClient() {
     },
   });
 
+  // Affiliate mode: no internal checkout — payment happens on the partner
+  // site. Anyone landing here (old link, manual URL) goes back home.
+  if (SALES_MODE === "affiliate") {
+    return (
+      <div className="mx-auto max-w-2xl px-4 pb-24 pt-32 text-center">
+        <p className="font-display text-2xl text-ink">{t("errors.expired")}</p>
+        <Link
+          href="/"
+          className="mt-6 inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-medium text-cream"
+        >
+          {t("backHome")}
+        </Link>
+      </div>
+    );
+  }
+
   if (!offer || !search) {
     if (confirmedCode) return null; // cleared after confirmation
     return (
@@ -112,8 +130,11 @@ export function BookingClient() {
   }
 
   const price = convert(offer.price.total, offer.price.currency, currency);
-  const fromCity = findAirport(search.origin)?.city[locale] ?? search.origin;
-  const toCity = findAirport(search.destination)?.city[locale] ?? search.destination;
+  const fromCity =
+    findAirport(search.origin)?.city[contentLocale(locale)] ?? search.origin;
+  const toCity =
+    findAirport(search.destination)?.city[contentLocale(locale)] ??
+    search.destination;
 
   const steps = [t("steps.passengers"), t("steps.review"), t("steps.payment")];
 

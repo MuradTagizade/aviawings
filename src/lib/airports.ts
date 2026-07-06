@@ -1,3 +1,5 @@
+import { contentLocale, intlLocale } from "@/lib/locale";
+
 export interface Airport {
   iata: string;
   city: { tr: string; en: string };
@@ -40,6 +42,10 @@ export const AIRPORTS: Airport[] = [
   { iata: "SVO", city: { tr: "Moskova", en: "Moscow" }, name: { tr: "Şeremetyevo", en: "Sheremetyevo" }, country: { tr: "Rusya", en: "Russia" }, countryCode: "RU", lat: 55.9736, lon: 37.4125, priority: 4 },
   { iata: "ALA", city: { tr: "Almatı", en: "Almaty" }, name: { tr: "Almatı Uluslararası", en: "Almaty International" }, country: { tr: "Kazakistan", en: "Kazakhstan" }, countryCode: "KZ", lat: 43.3521, lon: 77.0405, priority: 4 },
   { iata: "TAS", city: { tr: "Taşkent", en: "Tashkent" }, name: { tr: "İslam Karimov", en: "Islam Karimov" }, country: { tr: "Özbekistan", en: "Uzbekistan" }, countryCode: "UZ", lat: 41.2579, lon: 69.2812, priority: 4 },
+  { iata: "NQZ", city: { tr: "Astana", en: "Astana" }, name: { tr: "Nursultan Nazarbayev", en: "Nursultan Nazarbayev" }, country: { tr: "Kazakistan", en: "Kazakhstan" }, countryCode: "KZ", lat: 51.0272, lon: 71.4669, priority: 4 },
+  { iata: "FRU", city: { tr: "Bişkek", en: "Bishkek" }, name: { tr: "Manas Uluslararası", en: "Manas International" }, country: { tr: "Kırgızistan", en: "Kyrgyzstan" }, countryCode: "KG", lat: 43.0613, lon: 74.4776, priority: 4 },
+  { iata: "ASB", city: { tr: "Aşkabat", en: "Ashgabat" }, name: { tr: "Aşkabat Uluslararası", en: "Ashgabat International" }, country: { tr: "Türkmenistan", en: "Turkmenistan" }, countryCode: "TM", lat: 37.9868, lon: 58.361, priority: 4 },
+  { iata: "BUS", city: { tr: "Batum", en: "Batumi" }, name: { tr: "Batum Uluslararası", en: "Batumi International" }, country: { tr: "Gürcistan", en: "Georgia" }, countryCode: "GE", lat: 41.6103, lon: 41.5997, priority: 3 },
   { iata: "IKA", city: { tr: "Tahran", en: "Tehran" }, name: { tr: "İmam Humeyni", en: "Imam Khomeini" }, country: { tr: "İran", en: "Iran" }, countryCode: "IR", lat: 35.4161, lon: 51.1522, priority: 3 },
   { iata: "TLV", city: { tr: "Tel Aviv", en: "Tel Aviv" }, name: { tr: "Ben Gurion", en: "Ben Gurion" }, country: { tr: "İsrail", en: "Israel" }, countryCode: "IL", lat: 32.0114, lon: 34.8867, priority: 3 },
 ];
@@ -48,15 +54,17 @@ export function findAirport(iata: string): Airport | undefined {
   return AIRPORTS.find((a) => a.iata === iata.toUpperCase());
 }
 
-export function searchAirports(query: string, locale: "tr" | "en"): Airport[] {
-  const q = query.toLocaleLowerCase(locale === "tr" ? "tr-TR" : "en-US").trim();
+export function searchAirports(query: string, locale: string): Airport[] {
+  const loc = contentLocale(locale);
+  const tag = intlLocale(locale);
+  const q = query.toLocaleLowerCase(tag).trim();
   if (!q) {
     return [...AIRPORTS].sort((a, b) => b.priority - a.priority).slice(0, 8);
   }
   const scored = AIRPORTS.map((a) => {
-    const city = a.city[locale].toLocaleLowerCase(locale === "tr" ? "tr-TR" : "en-US");
-    const name = a.name[locale].toLocaleLowerCase(locale === "tr" ? "tr-TR" : "en-US");
-    const country = a.country[locale].toLocaleLowerCase(locale === "tr" ? "tr-TR" : "en-US");
+    const city = a.city[loc].toLocaleLowerCase(tag);
+    const name = a.name[loc].toLocaleLowerCase(tag);
+    const country = a.country[loc].toLocaleLowerCase(tag);
     const iata = a.iata.toLowerCase();
     let score = 0;
     if (iata === q) score = 100;
