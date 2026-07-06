@@ -22,7 +22,7 @@ export function PopularRoutes() {
   const ret = formatDateISO(addDays(new Date(), 21));
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+    <section className="mx-auto hidden max-w-7xl px-4 py-16 sm:block sm:px-6 sm:py-20 lg:px-8">
       <SectionHeader title={t("popularRoutes")} subtitle={t("popularRoutesSub")} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {routes.map((r, i) => {
